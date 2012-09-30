@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 2.8)
+
+PROJECT(basic-casio-parser)
+
+SET(${PROJECT_NAME}_SRC_DIRECTORY src/)
+SET(${PROJECT_NAME}_HEADER_DIRECTORY include/)
+
+INCLUDE_DIRECTORIES(${PROJECT_NAME}_HEADER_DIRECTORY)
+
+SET(CMAKE_CXX_FLAGS "-Wextra -Wall -std=c++0x -g3")
+
+SET(
+  ${PROJECT_NAME}_SRCS
+  ${${PROJECT_NAME}_SRC_DIRECTORY}/main.cpp
+  )
+
+
+ADD_EXECUTABLE(
+  ${PROJECT_NAME}
+  ${${PROJECT_NAME}_SRCS}
+  )
