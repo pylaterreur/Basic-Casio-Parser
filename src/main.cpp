@@ -1,28 +1,45 @@
 
 #include <iostream>
+#include <ios>
+#include <fstream>
+#include <iterator>
 
 #include "Parser.hpp"
 
 int main(int argc, char *argv[])
 {
-  if (argc < 2)
+  if (argc != 2)
     {
-      std::cerr << "Usage: " << *argv << "prog [subprog ...]" << std::endl;
+      std::cerr << "Usage: " << *argv << "filename" << std::endl;
       return (-1);
     }
-  Parser<std::string::const_iterator> p;
+
+  typedef std::string::const_iterator toto;
+
+  Parser<toto> p;
 
   // Program
   // int
   boost::variant<int, std::string>
     program;
 
-  const std::string str(argv[1]);
+  //  const std::string str(argv[1]);
+  std::ifstream in(argv[1]);
+  if (!in.good())
+    {
+      std::cerr << "Opening file \"" << argv[1] << "\" failed" << std::endl;
+      return (-1);
+    }
+
+  std::stringstream buffer;
+
+  buffer << in.rdbuf();
+  const std::string str(buffer.str());
 
   auto begin = str.begin();
   auto end = str.end();
 
-  bool r = boost::spirit::qi::parse(begin, end, p, program);
+  bool r = boost::spirit::qi::parse(begin, end, p);
 
   if (r && begin == end)
     {
@@ -30,7 +47,10 @@ int main(int argc, char *argv[])
     }
   else
     {
-      std::cerr << "fail" << std::endl;
+      std::string str(begin, end);
+      std::cerr << "fail at \""
+		<< str << "\""
+		<< std::endl;
     }
   std::cout << "Done" << std::endl;
 }
