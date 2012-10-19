@@ -10,6 +10,8 @@ struct AttributeType;
 
 # include "Program.hpp"
 # include "cmd/Locate.hpp"
+# include "cmd/If.hpp"
+# include "NumericExpression.hpp"
 
 using namespace boost::spirit::qi;
 

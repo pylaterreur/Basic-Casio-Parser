@@ -22,10 +22,6 @@ class Locate : public AttributeType<Locate<Iterator> >,
 						 typename AttributeType<Locate<Iterator> >::attribute_type()>
 {
 public:
-  struct Toto
-  {
-    typedef boost::tuple<int, int, std::string> attribute_type;
-  };
   using typename AttributeType<Locate<Iterator> >::attribute_type;
 
   Locate() : Locate::base_type(start_, "locate")
