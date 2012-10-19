@@ -13,7 +13,8 @@ int main(int argc, char *argv[])
   Parser<std::string::const_iterator> p;
 
   // Program
-  int
+  // int
+  boost::variant<int, std::string>
     program;
 
   const std::string str(argv[1]);
