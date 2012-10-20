@@ -20,8 +20,6 @@ public:
 
     new_line_ = lit('\n') | ':';
 
-    abs_ = lit("Abs ") >> numeric_rvalue_;
-
     and_ = lit(" And ");
 
 
@@ -73,8 +71,6 @@ public:
     gridoff_ = "GridOff";
     gridon_ = "GridOn";
     horizontal_ = "Horizontal " >> numeric_rvalue_;
-    int_f_ = "Int " >> numeric_rvalue_;
-    intg_ = "Intg " >> numeric_rvalue_;
     isz_ = "Isz " >> numeric_lvalue_;
     labeloff_ = "LabelOff";
     labelon_ = "LabelOn";
@@ -202,18 +198,8 @@ public:
     expression_no_comment_ = void_expression_ | list_rvalue_ | matrix_rvalue_ | numeric_rvalue_;
     expression_ = comment_ | expression_no_comment_;
 
-    arithmetic_unary_ = char_('-') | char_('+');
-    arithmetic_variable_ = char_("A-Z");
-    arithmetic_digit_ = char_("0-9");
-    arithmetic_number_ = +arithmetic_digit_;
-    arithmetic_constant_ = *arithmetic_unary_ >> (arithmetic_number_ | arithmetic_variable_);
-    arithmetic_add_ = char_("+");
-    arithmetic_multiply_ = char_("*");
-    arithmetic_term_ = arithmetic_constant_ >> *(arithmetic_multiply_ >> arithmetic_constant_);
-    arithmetic_expression_ = arithmetic_term_ >> *(arithmetic_add_ >> arithmetic_term_);
-
     // doesnt work yet xD
-    numeric_rvalue_ = eps >> arithmetic_expression_;
+    numeric_rvalue_ = eps >> arithmetic.expression;
 
     start_ %= *(expression_ >> +new_line_);
   }
@@ -225,15 +211,49 @@ private:
        // , boost::variant<int, std::string>()
        > start_;
 
-  boost::spirit::qi::rule<Iterator> arithmetic_expression_;
-  boost::spirit::qi::rule<Iterator> arithmetic_number_;
-  boost::spirit::qi::rule<Iterator> arithmetic_constant_;
-  boost::spirit::qi::rule<Iterator> arithmetic_add_;
-  boost::spirit::qi::rule<Iterator> arithmetic_multiply_;
-  boost::spirit::qi::rule<Iterator> arithmetic_variable_;
-  boost::spirit::qi::rule<Iterator> arithmetic_digit_;
-  boost::spirit::qi::rule<Iterator> arithmetic_unary_;
-  boost::spirit::qi::rule<Iterator> arithmetic_term_;
+  struct Arithmetic
+  {
+    typedef boost::spirit::qi::rule<Iterator> r;
+
+    r expression;
+    r number;
+    r constant;
+    r add;
+    r multiply;
+    r variable;
+    r digit;
+    r unary;
+    r term;
+    r function;
+    r simple_expression;
+
+
+    r abs_;
+    r int_f_;
+    r intg_;
+
+    Arithmetic()
+    {
+      using namespace boost::spirit::qi;
+
+      abs_ = lit("Abs ") >> simple_expression;
+      int_f_ = lit("Int ") >> simple_expression;
+      intg_ = lit("Intg ") >> simple_expression;
+     
+      function = int_f_ | intg_ | abs_;
+      unary = char_('-') | char_('+');
+      variable = char_("A-Z");
+      digit = char_("0-9");
+      number = +digit;
+      constant = *unary >> (function | number | variable);
+      simple_expression = (char_('(') >> expression >> char_(')'))
+	| constant;
+      add = char_("+");
+      multiply = char_("*");
+      term = constant >> *(multiply >> constant);
+      expression = (term >> *(add >> term)) | simple_expression;
+    }
+  } arithmetic;
 
 
   boost::spirit::qi::rule<Iterator> new_line_;
@@ -258,7 +278,6 @@ private:
   boost::spirit::qi::rule<Iterator> condition_for_;
 
   boost::spirit::qi::rule<Iterator> interrogation_mark_;
-  boost::spirit::qi::rule<Iterator> abs_;
   boost::spirit::qi::rule<Iterator> and_;
   boost::spirit::qi::rule<Iterator> ans_;
   boost::spirit::qi::rule<Iterator> augment_;
@@ -302,8 +321,6 @@ private:
   boost::spirit::qi::rule<Iterator> gridoff_;
   boost::spirit::qi::rule<Iterator> gridon_;
   boost::spirit::qi::rule<Iterator> horizontal_;
-  boost::spirit::qi::rule<Iterator> int_f_;
-  boost::spirit::qi::rule<Iterator> intg_;
   boost::spirit::qi::rule<Iterator> isz_;
   boost::spirit::qi::rule<Iterator> labeloff_;
   boost::spirit::qi::rule<Iterator> labelon_;
