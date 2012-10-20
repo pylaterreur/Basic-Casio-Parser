@@ -54,7 +54,7 @@ public:
     drawoff_ = "DrawOff";
     drawon_ = "DrawOn";
     drawstat_ = "DrawStat";
-    dsz_ = "Dsz" >> numeric_lvalue_;
+    dsz_ = "Dsz " >> numeric_lvalue_;
     fline_ = "F-Line "
       >> numeric_rvalue_ >> ','
       >> numeric_rvalue_ >> ','
@@ -142,16 +142,6 @@ public:
 
     number_ = int_;
 
-    // doesnt work yet xD
-    numeric_rvalue_ = *(char_('(') | operator_unary_) >> (number_
-							  | abs_
-							  | frac_
-							  | gcd_
-							  | getkey_
-							  | int_f_
-							  | intg_
-							  ) >> *char_(')') >> -(operator_binary_ >> numeric_lvalue_);
-
     simple_arrow_ = lit("->");
     double_arrow_ = lit("=>");
 
@@ -209,7 +199,21 @@ public:
     operator_eq_ = lit('=');
     operator_neq_ = lit("!=");
 
-    expression_ = void_expression_ | list_rvalue_ | matrix_rvalue_ | numeric_rvalue_;
+    expression_no_comment_ = void_expression_ | list_rvalue_ | matrix_rvalue_ | numeric_rvalue_;
+    expression_ = comment_ | expression_no_comment_;
+
+    arithmetic_unary_ = char_('-') | char_('+');
+    arithmetic_variable_ = char_("A-Z");
+    arithmetic_digit_ = char_("0-9");
+    arithmetic_number_ = +arithmetic_digit_;
+    arithmetic_constant_ = *arithmetic_unary_ >> (arithmetic_number_ | arithmetic_variable_);
+    arithmetic_add_ = char_("+");
+    arithmetic_multiply_ = char_("*");
+    arithmetic_term_ = arithmetic_constant_ >> *(arithmetic_multiply_ >> arithmetic_constant_);
+    arithmetic_expression_ = arithmetic_term_ >> *(arithmetic_add_ >> arithmetic_term_);
+
+    // doesnt work yet xD
+    numeric_rvalue_ = eps >> arithmetic_expression_;
 
     start_ %= *(expression_ >> +new_line_);
   }
@@ -220,6 +224,17 @@ private:
        // , Program()
        // , boost::variant<int, std::string>()
        > start_;
+
+  boost::spirit::qi::rule<Iterator> arithmetic_expression_;
+  boost::spirit::qi::rule<Iterator> arithmetic_number_;
+  boost::spirit::qi::rule<Iterator> arithmetic_constant_;
+  boost::spirit::qi::rule<Iterator> arithmetic_add_;
+  boost::spirit::qi::rule<Iterator> arithmetic_multiply_;
+  boost::spirit::qi::rule<Iterator> arithmetic_variable_;
+  boost::spirit::qi::rule<Iterator> arithmetic_digit_;
+  boost::spirit::qi::rule<Iterator> arithmetic_unary_;
+  boost::spirit::qi::rule<Iterator> arithmetic_term_;
+
 
   boost::spirit::qi::rule<Iterator> new_line_;
 
@@ -321,6 +336,7 @@ private:
   boost::spirit::qi::rule<Iterator> matrix_lvalue_;
   boost::spirit::qi::rule<Iterator> matrix_rvalue_;
   boost::spirit::qi::rule<Iterator> expression_;
+  boost::spirit::qi::rule<Iterator> expression_no_comment_;
   boost::spirit::qi::rule<Iterator> loop_expression_;
 
   boost::spirit::qi::rule<Iterator> list_index_;
