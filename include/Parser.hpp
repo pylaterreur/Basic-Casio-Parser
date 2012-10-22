@@ -4,8 +4,11 @@
 
 # include <boost/spirit/include/qi.hpp>
 # include <boost/variant.hpp>
+# include <stdio.h>
 
-# include "Program.hpp"
+# include "Comment.hpp"
+# include "Expression.hpp"
+
 
 template <typename Iterator>
 class Parser : public boost::spirit::qi::grammar<Iterator
@@ -21,10 +24,10 @@ public:
     new_line_ = lit('\n') | ':';
 
     and_ = lit(" And ");
+    ans_ = lit("Ans");
 
 
     interrogation_mark_ = '?';
-    ans_ = lit("Ans");
     augment_ = "Augment(" >> matrix_rvalue_ >> ',' >> matrix_rvalue_ >> ')';
 
     axesoff_ = lit("AxesOff");
@@ -83,7 +86,10 @@ public:
       >> numeric_rvalue_ >> ",\""
       >> *(~char_('"')) >> '"';
 
-    comment_ = '\'' >> *(char_ - new_line_);
+
+    comment_.name("comment_");
+    comment_ %= '\'' >> *(char_ - new_line_);
+    debug(comment_);
 
     condition_if_ = lit("If ")
       >> numeric_rvalue_ >> new_line_
@@ -196,7 +202,10 @@ public:
     operator_neq_ = lit("!=");
 
     expression_no_comment_ = void_expression_ | list_rvalue_ | matrix_rvalue_ | numeric_rvalue_;
-    expression_ = comment_ | expression_no_comment_;
+    expression_ %= comment_ | expression_no_comment_;
+
+    expression_.name("expression_");
+    debug(expression_);
 
     // doesnt work yet xD
     numeric_rvalue_ = eps >> arithmetic.expression;
@@ -229,6 +238,8 @@ private:
 
 
     r abs_;
+    r ans_;
+
     r int_f_;
     r intg_;
 
@@ -237,6 +248,7 @@ private:
       using namespace boost::spirit::qi;
 
       abs_ = lit("Abs ") >> simple_expression;
+      ans_ = lit("Ans");
       int_f_ = lit("Int ") >> simple_expression;
       intg_ = lit("Intg ") >> simple_expression;
      
@@ -266,7 +278,8 @@ private:
   boost::spirit::qi::rule<Iterator> double_arrow_;
   boost::spirit::qi::rule<Iterator> simple_arrow_;
 
-  boost::spirit::qi::rule<Iterator> comment_;
+  boost::spirit::qi::rule<Iterator, Comment()
+			  > comment_;
 
   boost::spirit::qi::rule<Iterator> operator_unary_;
   boost::spirit::qi::rule<Iterator> operator_binary_;
@@ -352,7 +365,7 @@ private:
   boost::spirit::qi::rule<Iterator> list_rvalue_;
   boost::spirit::qi::rule<Iterator> matrix_lvalue_;
   boost::spirit::qi::rule<Iterator> matrix_rvalue_;
-  boost::spirit::qi::rule<Iterator> expression_;
+  boost::spirit::qi::rule<Iterator, Expression()> expression_;
   boost::spirit::qi::rule<Iterator> expression_no_comment_;
   boost::spirit::qi::rule<Iterator> loop_expression_;
 
