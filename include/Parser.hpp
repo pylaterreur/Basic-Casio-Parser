@@ -21,13 +21,61 @@ public:
   {
     using namespace boost::spirit::qi;
 
+    // works
     new_line_ = lit('\n') | ':';
+
+    digit_ = char_("0-9");
+    variable_ = char_("A-Z");
+    number_ = +digit_
+      // | ans_
+      | (list_rvalue_ >> '[' >> expression_ >> ']')
+      | variable_
+      // can't remember matrix syntax
+      // | (matrix_rvalue_ >> )
+      ;
+
+    simple_expression_ = int_function_
+      | number_
+      | variable_
+      | ('(' >> expression_ >> ')');
+    produit_ = simple_expression_ >> *('*' >> simple_expression_);
+    somme_ = produit_ >> *('+' >> produit_);
+    numeric_rvalue_ = somme_ >> eps;
+
+    numeric_lvalue_ = 
+      (list_rvalue_ >> '[' >> expression_ >> ']')
+      | variable_;
+
+    assignment_ = numeric_rvalue_ >> "->" >> numeric_lvalue_;
+
+    expression_ =
+      assignment_
+      | numeric_rvalue_
+      | void_expression_
+      // | 
+      ;
+
+    start_ = *(expression_ >> +new_line_);
+    // !works
+
+    // should work
+
+    list_rvalue_ = lit("List ") >> list_index_;
+
+    list_index_ = int_;
+    mat_index_ = char_("A-Z") | ans_;
 
     and_ = lit(" And ");
     ans_ = lit("Ans");
 
-
     interrogation_mark_ = '?';
+
+
+
+    // !should work
+
+    int_function_ = "Int " >> simple_expression_;
+
     augment_ = "Augment(" >> matrix_rvalue_ >> ',' >> matrix_rvalue_ >> ')';
 
     axesoff_ = lit("AxesOff");
@@ -119,16 +167,12 @@ public:
 
     or_ = lit(" Or ");
 
-    list_index_ = int_;
-    mat_index_ = char_("A-Z") | ans_;
     
     list_lvalue_ = lit("List") >> -lit(' ') >> list_index_;
 
     list_rvalue_ = list_ | ('{' >> (numeric_rvalue_ % ',') >> '}');
 
 
-
-    variable_  = char_("A-Z");
 
     numeric_lvalue_ = (list_rvalue_ >> '[' >> numeric_rvalue_ >> ']') | variable_;
 
@@ -196,21 +240,6 @@ public:
       // | 
       ;
 
-    operator_gt_ = lit('>');
-    operator_lt_ = lit('<');
-    operator_eq_ = lit('=');
-    operator_neq_ = lit("!=");
-
-    expression_no_comment_ = void_expression_ | list_rvalue_ | matrix_rvalue_ | numeric_rvalue_;
-    expression_ %= comment_ | expression_no_comment_;
-
-    expression_.name("expression_");
-    debug(expression_);
-
-    // doesnt work yet xD
-    numeric_rvalue_ = eps >> arithmetic.expression;
-
-    start_ %= *(expression_ >> +new_line_);
   }
 
 private:
@@ -220,53 +249,13 @@ private:
        // , boost::variant<int, std::string>()
        > start_;
 
-  struct Arithmetic
-  {
-    typedef boost::spirit::qi::rule<Iterator> r;
-
-    r expression;
-    r number;
-    r constant;
-    r add;
-    r multiply;
-    r variable;
-    r digit;
-    r unary;
-    r term;
-    r function;
-    r simple_expression;
-
-
-    r abs_;
-    r ans_;
-
-    r int_f_;
-    r intg_;
-
-    Arithmetic()
-    {
-      using namespace boost::spirit::qi;
-
-      abs_ = lit("Abs ") >> simple_expression;
-      ans_ = lit("Ans");
-      int_f_ = lit("Int ") >> simple_expression;
-      intg_ = lit("Intg ") >> simple_expression;
-     
-      function = int_f_ | intg_ | abs_;
-      unary = char_('-') | char_('+');
-      variable = char_("A-Z");
-      digit = char_("0-9");
-      number = +digit;
-      constant = *unary >> (function | number | variable);
-      simple_expression = (char_('(') >> expression >> char_(')'))
-	| constant;
-      add = char_("+");
-      multiply = char_("*");
-      term = constant >> *(multiply >> constant);
-      expression = (term >> *(add >> term)) | simple_expression;
-    }
-  } arithmetic;
-
+  boost::spirit::qi::rule<Iterator> simple_expression_;
+  boost::spirit::qi::rule<Iterator> int_function_;
+  boost::spirit::qi::rule<Iterator> expression_;
+  boost::spirit::qi::rule<Iterator> somme_;
+  boost::spirit::qi::rule<Iterator> produit_;
+  boost::spirit::qi::rule<Iterator> digit_;
+  boost::spirit::qi::rule<Iterator> unary_;
 
   boost::spirit::qi::rule<Iterator> new_line_;
 
@@ -365,7 +354,7 @@ private:
   boost::spirit::qi::rule<Iterator> list_rvalue_;
   boost::spirit::qi::rule<Iterator> matrix_lvalue_;
   boost::spirit::qi::rule<Iterator> matrix_rvalue_;
-  boost::spirit::qi::rule<Iterator, Expression()> expression_;
+  //  boost::spirit::qi::rule<Iterator, Expression()> expression_;
   boost::spirit::qi::rule<Iterator> expression_no_comment_;
   boost::spirit::qi::rule<Iterator> loop_expression_;
 
