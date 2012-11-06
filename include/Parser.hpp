@@ -3,12 +3,12 @@
 # define PARSER_HPP_
 
 # include <boost/spirit/include/qi.hpp>
+# include <boost/spirit/include/phoenix.hpp>
 # include <boost/variant.hpp>
 # include <stdio.h>
 
 # include "Comment.hpp"
 # include "Expression.hpp"
-
 
 template <typename Iterator>
 class Parser : public boost::spirit::qi::grammar<Iterator
@@ -24,22 +24,26 @@ public:
     // works
     new_line_ = lit('\n') | ':';
 
-    digit_ = char_("0-9");
+    digit_ =
+      char_("0-9")[_val = _1 - '0'];
     variable_ = char_("A-Z");
-    number_ = +digit_
-      // | ans_
-      | (list_rvalue_ >> '[' >> expression_ >> ']')
-      | variable_
-      // can't remember matrix syntax
-      // | (matrix_rvalue_ >> )
+    number_ = eps[_val = 0] >> 
+      +digit_[_val = (_val * 10 + _1)]
       ;
 
+    // should add the *unary soon!
     simple_expression_ = int_function_
       | number_
+
+      | (list_rvalue_ >> '[' >> simple_expression_ >> ']')
       | variable_
+      // | ans_
+      // can't remember matrix syntax
+      // | (matrix_rvalue_ >> )
+
       | ('(' >> expression_ >> ')');
-    produit_ = simple_expression_ >> *('*' >> simple_expression_);
-    somme_ = produit_ >> *('+' >> produit_);
+    produit_ = simple_expression_ >> *(char_("*/") >> simple_expression_);
+    somme_ = produit_ >> *(char_("+-") >> produit_);
     numeric_rvalue_ = somme_ >> eps;
 
     numeric_lvalue_ = 
@@ -83,7 +87,7 @@ public:
     bg_none_ = lit("BG-None");
     bg_pict_ = lit("BG-Pict ") >> int_;
     break_ = lit("Break");
-    circle_ = lit("Circle ") >> numeric_rvalue_ >> ',' >> numeric_rvalue_ >> ',' >> numeric_rvalue_;
+    circle_ = lit("Circle ") >> simple_expression_ >> ',' >> simple_expression_ >> ',' >> simple_expression_;
     clrgraph_ = lit("ClrGraph");
     clrlist_ = lit("ClrList ") >> -(list_index_);
     clrmat_ = lit("ClrMat") >> -(mat_index_);
@@ -105,33 +109,34 @@ public:
     drawstat_ = "DrawStat";
     dsz_ = "Dsz " >> numeric_lvalue_;
     fline_ = "F-Line "
-      >> numeric_rvalue_ >> ','
-      >> numeric_rvalue_ >> ','
-      >> numeric_rvalue_ >> ','
-      >> numeric_rvalue_;
+      >> simple_expression_ >> ','
+      >> simple_expression_ >> ','
+      >> simple_expression_ >> ','
+      >> simple_expression_;
     file_index_ = int_;
     file_ = "File" >> file_index_;
-    fix_ = "Fix " >> numeric_rvalue_;
-    frac_ = "Frac " >> numeric_rvalue_;
+    fix_ = "Fix " >> simple_expression_;
+    frac_ = "Frac " >> simple_expression_;
     gconnect_ = "G-Connect";
     gplot_ = "G-Plot";
-    gcd_ = "GCD(" >> numeric_rvalue_ >> ',' >> numeric_rvalue_ >> ')';
+    gcd_ = "GCD(" >> simple_expression_ >> ',' >> simple_expression_ >> ')';
     getkey_ = "Getkey";
+
+    label_index_ = char_("0-9A-Z");
     goto_ = "Goto " >> label_index_;
+
     gra_ = "Gra";
     gridoff_ = "GridOff";
     gridon_ = "GridOn";
-    horizontal_ = "Horizontal " >> numeric_rvalue_;
+    horizontal_ = "Horizontal " >> simple_expression_;
     isz_ = "Isz " >> numeric_lvalue_;
     labeloff_ = "LabelOff";
     labelon_ = "LabelOn";
 
 
-    label_index_ = char_("0-9A-Z");
-
     locate_ = lit("Locate ")
-      >> numeric_rvalue_ >> ','
-      >> numeric_rvalue_ >> ",\""
+      >> simple_expression_ >> ','
+      >> simple_expression_ >> ",\""
       >> *(~char_('"')) >> '"';
 
 
@@ -171,22 +176,6 @@ public:
     list_lvalue_ = lit("List") >> -lit(' ') >> list_index_;
 
     list_rvalue_ = list_ | ('{' >> (numeric_rvalue_ % ',') >> '}');
-
-
-
-    numeric_lvalue_ = (list_rvalue_ >> '[' >> numeric_rvalue_ >> ']') | variable_;
-
-    operator_binary_ = operator_gt_
-      | operator_lt_
-      | operator_eq_
-      | operator_neq_
-      | and_
-      | or_
-      | char_("-+*/")
-      ;
-    operator_unary_ = char_("-+");
-
-    number_ = int_;
 
     simple_arrow_ = lit("->");
     double_arrow_ = lit("=>");
@@ -254,7 +243,8 @@ private:
   boost::spirit::qi::rule<Iterator> expression_;
   boost::spirit::qi::rule<Iterator> somme_;
   boost::spirit::qi::rule<Iterator> produit_;
-  boost::spirit::qi::rule<Iterator> digit_;
+  boost::spirit::qi::rule<Iterator, int()
+			  > digit_;
   boost::spirit::qi::rule<Iterator> unary_;
 
   boost::spirit::qi::rule<Iterator> new_line_;
@@ -262,16 +252,13 @@ private:
   boost::spirit::qi::rule<Iterator> label_index_;
 
   boost::spirit::qi::rule<Iterator> assignment_;
-  boost::spirit::qi::rule<Iterator> number_;
+  boost::spirit::qi::rule<Iterator, int()> number_;
 
   boost::spirit::qi::rule<Iterator> double_arrow_;
   boost::spirit::qi::rule<Iterator> simple_arrow_;
 
   boost::spirit::qi::rule<Iterator, Comment()
 			  > comment_;
-
-  boost::spirit::qi::rule<Iterator> operator_unary_;
-  boost::spirit::qi::rule<Iterator> operator_binary_;
 
   boost::spirit::qi::rule<Iterator> locate_;
   boost::spirit::qi::rule<Iterator> condition_if_;
@@ -339,13 +326,6 @@ private:
   boost::spirit::qi::rule<Iterator> or_;
 
   boost::spirit::qi::rule<Iterator> file_index_;
-
-  boost::spirit::qi::rule<Iterator> operator_gt_;
-  boost::spirit::qi::rule<Iterator> operator_lt_;
-  boost::spirit::qi::rule<Iterator> operator_eq_;
-  boost::spirit::qi::rule<Iterator> operator_neq_;
-
-
 
   boost::spirit::qi::rule<Iterator> void_expression_;
   boost::spirit::qi::rule<Iterator> numeric_lvalue_;
