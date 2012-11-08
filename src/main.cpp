@@ -20,7 +20,8 @@ int main(int argc, char *argv[])
 
   // Program
   // int
-  boost::variant<int, std::string>
+  // boost::variant<int, Variable>
+  SimpleExpression
     program;
 
   //  const std::string str(argv[1]);
@@ -39,7 +40,7 @@ int main(int argc, char *argv[])
   auto begin = str.begin();
   auto end = str.end();
 
-  bool r = boost::spirit::qi::parse(begin, end, p);
+  bool r = boost::spirit::qi::parse(begin, end, p, program);
 
   if (r && begin == end)
     {

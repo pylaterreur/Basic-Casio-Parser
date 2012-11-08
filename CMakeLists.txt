@@ -7,12 +7,14 @@ INCLUDE_DIRECTORIES(
   ${${PROJECT_NAME}_HEADER_DIRECTORY}
   )
 
-SET(CMAKE_CXX_FLAGS "-Wextra -Wall -std=c++0x -g3")
+SET(CMAKE_CXX_FLAGS "-Wextra -Wall -std=c++0x")
 
 SET(${PROJECT_NAME}_SRC_DIRECTORY src/)
 SET(
   ${PROJECT_NAME}_SRCS
   ${${PROJECT_NAME}_SRC_DIRECTORY}/main.cpp
+  ${${PROJECT_NAME}_SRC_DIRECTORY}/Variable.cpp
+  ${${PROJECT_NAME}_SRC_DIRECTORY}/List.cpp
   )
 
 

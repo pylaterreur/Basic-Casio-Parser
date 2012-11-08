@@ -5,19 +5,24 @@
 # include <boost/spirit/include/qi.hpp>
 # include <boost/spirit/include/phoenix.hpp>
 # include <boost/variant.hpp>
-# include <stdio.h>
 
 # include "Comment.hpp"
-# include "Expression.hpp"
+# include "Variable.hpp"
+# include "List.hpp"
 
 template <typename Iterator>
 class Parser : public boost::spirit::qi::grammar<Iterator
 						 // , Program()
 						 // , boost::variant<int, std::string>()
+
+						 // , boost::variant<int, Variable>()
+						 , SimpleExpression()
 						 >
 {
 public:
-  Parser() : Parser::base_type(start_, "start")
+  Parser() : Parser::base_type(// start_
+			       simple_expression_
+			       , "start")
   {
     using namespace boost::spirit::qi;
 
@@ -28,20 +33,24 @@ public:
       char_("0-9")[_val = _1 - '0'];
     variable_ = char_("A-Z");
     number_ = eps[_val = 0] >> 
-      +digit_[_val = (_val * 10 + _1)]
-      ;
+      +digit_[_val = (_val * 10 + _1)];
 
     // should add the *unary soon!
-    simple_expression_ = int_function_
-      | number_
-
-      | (list_rvalue_ >> '[' >> simple_expression_ >> ']')
+    simple_expression_ = 
+      (
+      // int_function_ |
+      number_
+      // | (list_rvalue_ >> '[' >> simple_expression_ >> ']')
       | variable_
       // | ans_
       // can't remember matrix syntax
       // | (matrix_rvalue_ >> )
 
-      | ('(' >> expression_ >> ')');
+      // | ('(' >> expression_ >> ')')
+
+      )
+      >> -lit('\n')
+      ;
     produit_ = simple_expression_ >> *(char_("*/") >> simple_expression_);
     somme_ = produit_ >> *(char_("+-") >> produit_);
     numeric_rvalue_ = somme_ >> eps;
@@ -59,7 +68,11 @@ public:
       // | 
       ;
 
-    start_ = *(expression_ >> +new_line_);
+    // start_ %= simple_expression_ >> -lit('\n');
+
+    // uncomment!!!!!! PYRO UNCOMMENT!
+    //    start_ = *(expression_ >> +new_line_);
+
     // !works
 
     // should work
@@ -236,15 +249,31 @@ private:
   boost::spirit::qi::rule<Iterator
        // , Program()
        // , boost::variant<int, std::string>()
+
+			  , SimpleExpression()
+			  //boost::variant<int, Variable>()
        > start_;
 
-  boost::spirit::qi::rule<Iterator> simple_expression_;
+  /*
+    simple_expression_ = int_function_
+      | number_
+
+      | (list_rvalue_ >> '[' >> simple_expression_ >> ']')
+      | variable_
+  */
+
+  // SimpleExpression
+  boost::spirit::qi::rule<Iterator
+			  // , boost::variant<int, Variable>()
+			  , SimpleExpression() 
+			  > simple_expression_;
   boost::spirit::qi::rule<Iterator> int_function_;
   boost::spirit::qi::rule<Iterator> expression_;
   boost::spirit::qi::rule<Iterator> somme_;
   boost::spirit::qi::rule<Iterator> produit_;
-  boost::spirit::qi::rule<Iterator, int()
-			  > digit_;
+  boost::spirit::qi::rule<Iterator, int()> digit_;
+  boost::spirit::qi::rule<Iterator, Variable()> variable_;
+
   boost::spirit::qi::rule<Iterator> unary_;
 
   boost::spirit::qi::rule<Iterator> new_line_;
@@ -341,7 +370,6 @@ private:
   boost::spirit::qi::rule<Iterator> list_index_;
   boost::spirit::qi::rule<Iterator> mat_index_;
 
-  boost::spirit::qi::rule<Iterator> variable_;
   boost::spirit::qi::rule<Iterator> list_;
   boost::spirit::qi::rule<Iterator> matrix_;
 };
