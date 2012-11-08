@@ -9,6 +9,13 @@
 # include "Comment.hpp"
 # include "Variable.hpp"
 # include "List.hpp"
+# include "SimpleExpression.hpp"
+
+typedef
+// SimpleExpression
+// List
+ListRvalue
+LOL;
 
 template <typename Iterator>
 class Parser : public boost::spirit::qi::grammar<Iterator
@@ -16,15 +23,19 @@ class Parser : public boost::spirit::qi::grammar<Iterator
 						 // , boost::variant<int, std::string>()
 
 						 // , boost::variant<int, Variable>()
-						 , SimpleExpression()
+						 , LOL()
 						 >
 {
 public:
   Parser() : Parser::base_type(// start_
-			       simple_expression_
+			       // simple_expression_
+			       list_rvalue_
 			       , "start")
   {
     using namespace boost::spirit::qi;
+
+    list_index_ = uint_;
+    list_ = lit("List ") >> list_index_;
 
     // works
     new_line_ = lit('\n') | ':';
@@ -56,7 +67,9 @@ public:
     numeric_rvalue_ = somme_ >> eps;
 
     numeric_lvalue_ = 
-      (list_rvalue_ >> '[' >> expression_ >> ']')
+      (list_rvalue_ >> '[' >> // expression_
+       simple_expression_
+       >> ']')
       | variable_;
 
     assignment_ = numeric_rvalue_ >> "->" >> numeric_lvalue_;
@@ -77,9 +90,6 @@ public:
 
     // should work
 
-    list_rvalue_ = lit("List ") >> list_index_;
-
-    list_index_ = int_;
     mat_index_ = char_("A-Z") | ans_;
 
     and_ = lit(" And ");
@@ -188,7 +198,10 @@ public:
     
     list_lvalue_ = lit("List") >> -lit(' ') >> list_index_;
 
-    list_rvalue_ = list_ | ('{' >> (numeric_rvalue_ % ',') >> '}');
+    list_const_ = ('{' >> (// numeric_rvalue_
+			   simple_expression_
+			   % ',') >> '}');
+    list_rvalue_ = list_ | list_const_;
 
     simple_arrow_ = lit("->");
     double_arrow_ = lit("=>");
@@ -250,7 +263,7 @@ private:
        // , Program()
        // , boost::variant<int, std::string>()
 
-			  , SimpleExpression()
+			  , LOL()
 			  //boost::variant<int, Variable>()
        > start_;
 
@@ -267,7 +280,8 @@ private:
 			  // , boost::variant<int, Variable>()
 			  , SimpleExpression() 
 			  > simple_expression_;
-  boost::spirit::qi::rule<Iterator> int_function_;
+  boost::spirit::qi::rule<Iterator// , IntFunction()
+			  > int_function_;
   boost::spirit::qi::rule<Iterator> expression_;
   boost::spirit::qi::rule<Iterator> somme_;
   boost::spirit::qi::rule<Iterator> produit_;
@@ -360,17 +374,23 @@ private:
   boost::spirit::qi::rule<Iterator> numeric_lvalue_;
   boost::spirit::qi::rule<Iterator> numeric_rvalue_;
   boost::spirit::qi::rule<Iterator> list_lvalue_;
-  boost::spirit::qi::rule<Iterator> list_rvalue_;
+
+
+  boost::spirit::qi::rule<Iterator, ListConst()
+			  > list_const_;
+
+  boost::spirit::qi::rule<Iterator, ListRvalue()
+			  > list_rvalue_;
   boost::spirit::qi::rule<Iterator> matrix_lvalue_;
   boost::spirit::qi::rule<Iterator> matrix_rvalue_;
   //  boost::spirit::qi::rule<Iterator, Expression()> expression_;
   boost::spirit::qi::rule<Iterator> expression_no_comment_;
   boost::spirit::qi::rule<Iterator> loop_expression_;
 
-  boost::spirit::qi::rule<Iterator> list_index_;
+  boost::spirit::qi::rule<Iterator, unsigned int()> list_index_;
   boost::spirit::qi::rule<Iterator> mat_index_;
 
-  boost::spirit::qi::rule<Iterator> list_;
+  boost::spirit::qi::rule<Iterator, List()> list_;
   boost::spirit::qi::rule<Iterator> matrix_;
 };
 
