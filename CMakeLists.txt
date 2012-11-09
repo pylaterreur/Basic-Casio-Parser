@@ -16,6 +16,7 @@ SET(
   ${${PROJECT_NAME}_SRC_DIRECTORY}/Variable.cpp
   ${${PROJECT_NAME}_SRC_DIRECTORY}/List.cpp
   ${${PROJECT_NAME}_SRC_DIRECTORY}/SimpleExpression.cpp
+  ${${PROJECT_NAME}_SRC_DIRECTORY}/Produit.cpp
   )
 
 

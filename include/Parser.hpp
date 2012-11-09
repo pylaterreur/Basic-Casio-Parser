@@ -10,12 +10,21 @@
 # include "Variable.hpp"
 # include "List.hpp"
 # include "SimpleExpression.hpp"
+# include "Produit.hpp"
 
 typedef
-SimpleExpression
+// SimpleExpression
 // List
 // ListRvalue
+// Produit
+std::vector<SimpleExpression>
 LOL;
+
+std::ostream &operator<<(std::ostream& o, const LOL &l)
+{
+  o << "LOL" << std::endl;
+  return (o);
+}
 
 template <typename Iterator>
 class Parser : public boost::spirit::qi::grammar<Iterator
@@ -28,8 +37,9 @@ class Parser : public boost::spirit::qi::grammar<Iterator
 {
 public:
   Parser() : Parser::base_type(// start_
-			       simple_expression_
+			       // simple_expression_
 			       // list_rvalue_
+			       produit_
 			       , "start")
   {
     using namespace boost::spirit::qi;
@@ -63,7 +73,11 @@ public:
       )
       >> -lit('\n')
       ;
-    produit_ = simple_expression_ >> *(char_("*/") >> simple_expression_);
+
+    // multiply_ = 
+    produit_ = simple_expression_ % // char_("*/")
+      '*'
+      ;
     somme_ = produit_ >> *(char_("+-") >> produit_);
     numeric_rvalue_ = somme_ >> eps;
 
@@ -285,7 +299,10 @@ private:
 			  > int_function_;
   boost::spirit::qi::rule<Iterator> expression_;
   boost::spirit::qi::rule<Iterator> somme_;
-  boost::spirit::qi::rule<Iterator> produit_;
+  boost::spirit::qi::rule<Iterator
+			  //, Produit()
+			  , std::vector<SimpleExpression>()
+			  > produit_;
   boost::spirit::qi::rule<Iterator, int()> digit_;
   boost::spirit::qi::rule<Iterator, Variable()> variable_;
 
