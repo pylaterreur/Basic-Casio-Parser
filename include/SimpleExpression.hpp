@@ -13,13 +13,13 @@ struct List;
 
 # include "List.hpp"
 
-struct CACA;
+struct ListIndex;
 
 struct SimpleExpression
 {
   typedef boost::variant<int
 			 // , boost::tuple<List, SimpleExpression>
-			 , boost::recursive_wrapper<CACA>
+			 , boost::recursive_wrapper<ListIndex>
 			 , Variable> TypeValue;
   TypeValue value;
 };
@@ -28,13 +28,13 @@ BOOST_FUSION_ADAPT_STRUCT(SimpleExpression,
 			  (SimpleExpression::TypeValue, value)
 			  )
 
-struct CACA
+struct ListIndex
 {
   List t1;
   SimpleExpression t2;
 };
 
-BOOST_FUSION_ADAPT_STRUCT(CACA,
+BOOST_FUSION_ADAPT_STRUCT(ListIndex,
 			  (List, t1)
 			  (SimpleExpression, t2)
 			  )
@@ -46,6 +46,6 @@ std::ostream &operator<<(std::ostream &o, const SimpleExpression &s);
 
 std::ostream &operator<<(std::ostream &o, const boost::tuple<List, SimpleExpression> &t);
 
-std::ostream &operator<<(std::ostream &o, const CACA &c);
+std::ostream &operator<<(std::ostream &o, const ListIndex &c);
 
 #endif	// !SIMPLEEXPRESSION_HPP_
