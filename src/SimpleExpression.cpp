@@ -14,3 +14,9 @@ std::ostream &operator<<(std::ostream &o, const boost::tuple<List, SimpleExpress
   o << "Tuple List " << t.get<0>() << " " << t.get<1>();
   return (o);
 }
+
+std::ostream &operator<<(std::ostream &o, const CACA &c)
+{
+  o << c.t1 << " " << c.t2 << std::endl;
+  return (o);
+}

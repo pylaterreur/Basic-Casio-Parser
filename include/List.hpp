@@ -7,10 +7,13 @@
 
 # include <iosfwd>
 
+# include <vector>
+
 # include <boost/variant/recursive_variant.hpp>
 
 # include "Variable.hpp"
-# include "SimpleExpression.hpp"
+
+struct SimpleExpression;
 
 struct List
 {
@@ -65,5 +68,7 @@ BOOST_FUSION_ADAPT_STRUCT(ListRvalue,
 std::ostream &operator<<(std::ostream &o, const ListRvalue &l);
 
 std::ostream &operator<<(std::ostream &o, const ListConst &l);
+
+# include "SimpleExpression.hpp"
 
 #endif	// !LIST_HPP_

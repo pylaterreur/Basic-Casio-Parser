@@ -12,9 +12,9 @@
 # include "SimpleExpression.hpp"
 
 typedef
-// SimpleExpression
+SimpleExpression
 // List
-ListRvalue
+// ListRvalue
 LOL;
 
 template <typename Iterator>
@@ -28,8 +28,8 @@ class Parser : public boost::spirit::qi::grammar<Iterator
 {
 public:
   Parser() : Parser::base_type(// start_
-			       // simple_expression_
-			       list_rvalue_
+			       simple_expression_
+			       // list_rvalue_
 			       , "start")
   {
     using namespace boost::spirit::qi;
@@ -51,7 +51,8 @@ public:
       (
       // int_function_ |
       number_
-      // | (list_rvalue_ >> '[' >> simple_expression_ >> ']')
+      | (list_ >> '[' >> simple_expression_ >> ']')
+      // | (lit('e') >> int_ >> ',' >> char_)
       | variable_
       // | ans_
       // can't remember matrix syntax
