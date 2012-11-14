@@ -10,17 +10,24 @@
 # include "Variable.hpp"
 
 struct List;
+struct Somme;
 
 # include "List.hpp"
 
 struct ListIndex;
 
+struct NumericFunction
+{};
+
 struct SimpleExpression
 {
   typedef boost::variant<int
+			 , NumericFunction
 			 // , boost::tuple<List, SimpleExpression>
 			 , boost::recursive_wrapper<ListIndex>
-			 , Variable> TypeValue;
+			 , Variable
+			 , boost::recursive_wrapper<Somme>
+			 > TypeValue;
   TypeValue value;
 };
 

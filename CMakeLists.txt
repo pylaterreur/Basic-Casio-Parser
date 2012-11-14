@@ -19,6 +19,7 @@ SET(
   ${${PROJECT_NAME}_SRC_DIRECTORY}/Produit.cpp
   ${${PROJECT_NAME}_SRC_DIRECTORY}/Somme.cpp
   ${${PROJECT_NAME}_SRC_DIRECTORY}/Expression.cpp
+  ${${PROJECT_NAME}_SRC_DIRECTORY}/VoidExpression.cpp
   )
 
 

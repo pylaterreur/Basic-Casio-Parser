@@ -5,7 +5,8 @@
 
 std::ostream &operator<<(std::ostream &o, const SimpleExpression &s)
 {
-  o << "SimpleExpression" << s.value;
+  o << "SimpleExpression" // << s.value
+    ;
   return (o);
 }
 

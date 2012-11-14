@@ -7,10 +7,6 @@
 struct VoidExpression
 {};
 
-std::ostream &operator<<(std::ostream& o, const VoidExpression&)
-{
-  o << "VoidExpression" << std::endl;
-  return (o);
-}
+std::ostream &operator<<(std::ostream& o, const VoidExpression&);
 
 #endif	// !VOIDEXPRESSION_HPP_

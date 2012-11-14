@@ -13,6 +13,8 @@
 # include "Produit.hpp"
 # include "Somme.hpp"
 
+# include "Expression.hpp"
+
 typedef
 // SimpleExpression
 // List
@@ -61,19 +63,19 @@ public:
     // should add the *unary soon!
     simple_expression_ = 
       (
-      // int_function_ |
-      number_
-      | (list_ >> '[' >> simple_expression_ >> ']')
-      // | (lit('e') >> int_ >> ',' >> char_)
-      | variable_
+       number_
+       | numeric_function_
+       | (list_ >> '[' >> simple_expression_ >> ']')
+       // | (lit('e') >> int_ >> ',' >> char_)
+       | variable_
       // | ans_
       // can't remember matrix syntax
       // | (matrix_rvalue_ >> )
 
-      // | ('(' >> expression_ >> ')')
+      | ('(' >> somme_ >> ')')
 
       )
-      >> -lit('\n')
+      >> eps
       ;
 
     multiply_ = '*' >> produit_;
@@ -119,7 +121,9 @@ public:
 
     // !should work
 
+    numeric_function_ = int_function_ | abs_;
     int_function_ = "Int " >> simple_expression_;
+    abs_ = "Abs " >> simple_expression_;
 
     augment_ = "Augment(" >> matrix_rvalue_ >> ',' >> matrix_rvalue_ >> ')';
 
@@ -298,8 +302,14 @@ private:
 			  // , boost::variant<int, Variable>()
 			  , SimpleExpression() 
 			  > simple_expression_;
+
+  boost::spirit::qi::rule<Iterator// , IntFunction()
+			  > numeric_function_;
+
   boost::spirit::qi::rule<Iterator// , IntFunction()
 			  > int_function_;
+  boost::spirit::qi::rule<Iterator// , Abs()
+			  > abs_;
   boost::spirit::qi::rule<Iterator> expression_;
 
   boost::spirit::qi::rule<Iterator, Somme()> somme_;

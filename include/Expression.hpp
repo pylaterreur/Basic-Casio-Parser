@@ -23,6 +23,6 @@ BOOST_FUSION_ADAPT_STRUCT(Expression,
 			  (Expression::TypeValue, value)
 			  )
 
-std::ostream &operator<<(std::ostream &o, const Expression &s);
+std::ostream &operator<<(std::ostream &o, const Expression &);
 
 #endif	// !EXPRESSION_HPP_
