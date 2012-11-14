@@ -47,7 +47,8 @@ int main(int argc, char *argv[])
 
   if (r && begin == end)
     {
-      std::cout << "program " << program << std::endl;
+      std::cout << "program " // << program
+		<< std::endl;
     }
   else
     {

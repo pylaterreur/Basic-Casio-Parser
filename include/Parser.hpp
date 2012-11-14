@@ -20,8 +20,9 @@ typedef
 // List
 // ListRvalue
 // Produit
-Somme
-// std::vector<SimpleExpression>
+// Somme
+// Expression
+std::vector<Expression>
 LOL;
 
 // std::ostream &operator<<(std::ostream& o, const LOL &l)
@@ -43,7 +44,7 @@ public:
   Parser() : Parser::base_type(// start_
 			       // simple_expression_
 			       // list_rvalue_
-			       somme_
+			       start_
 			       , "start")
   {
     using namespace boost::spirit::qi;
@@ -95,16 +96,17 @@ public:
     assignment_ = numeric_rvalue_ >> "->" >> numeric_lvalue_;
 
     expression_ =
-      assignment_
-      | numeric_rvalue_
-      | void_expression_
+      // assignment_
+      // | 
+      void_expression_
+      | somme_
       // | 
       ;
 
     // start_ %= simple_expression_ >> -lit('\n');
 
     // uncomment!!!!!! PYRO UNCOMMENT!
-    //    start_ = *(expression_ >> +new_line_);
+    start_ = expression_ % +new_line_;
 
     // !works
 
@@ -310,7 +312,7 @@ private:
 			  > int_function_;
   boost::spirit::qi::rule<Iterator// , Abs()
 			  > abs_;
-  boost::spirit::qi::rule<Iterator> expression_;
+  boost::spirit::qi::rule<Iterator, Expression()> expression_;
 
   boost::spirit::qi::rule<Iterator, Somme()> somme_;
   boost::spirit::qi::rule<Iterator, Add()> add_;
