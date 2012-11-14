@@ -5,16 +5,42 @@
 # include <boost/fusion/include/adapt_struct.hpp>
 # include <vector>
 
+# include <boost/spirit/include/qi_optional.hpp>
+
 # include "SimpleExpression.hpp"
+
+struct Multiply;
+struct Divide;
 
 struct Produit
 {
-  typedef std::vector<SimpleExpression> TypeValue;
-  TypeValue value;
+  SimpleExpression left;
+  typedef boost::optional<boost::variant<boost::recursive_wrapper<Multiply>,
+					 boost::recursive_wrapper<Divide> > > RightType;
+  RightType right;
 };
 
 BOOST_FUSION_ADAPT_STRUCT(Produit,
-			  (Produit::TypeValue, value)
+			  (SimpleExpression, left)
+			  (Produit::RightType, right)
+			  )
+
+struct Multiply
+{
+  Produit value;
+};
+
+BOOST_FUSION_ADAPT_STRUCT(Multiply,
+			  (Produit, value)
+			  )
+
+struct Divide
+{
+  Produit value;
+};
+
+BOOST_FUSION_ADAPT_STRUCT(Divide,
+			  (Produit, value)
 			  )
 
 std::ostream &operator<<(std::ostream &o, const Produit &v);

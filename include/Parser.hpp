@@ -11,20 +11,22 @@
 # include "List.hpp"
 # include "SimpleExpression.hpp"
 # include "Produit.hpp"
+# include "Somme.hpp"
 
 typedef
 // SimpleExpression
 // List
 // ListRvalue
 // Produit
-std::vector<SimpleExpression>
+Somme
+// std::vector<SimpleExpression>
 LOL;
 
-std::ostream &operator<<(std::ostream& o, const LOL &l)
-{
-  o << "LOL" << std::endl;
-  return (o);
-}
+// std::ostream &operator<<(std::ostream& o, const LOL &l)
+// {
+//   o << "LOL" << std::endl;
+//   return (o);
+// }
 
 template <typename Iterator>
 class Parser : public boost::spirit::qi::grammar<Iterator
@@ -39,7 +41,7 @@ public:
   Parser() : Parser::base_type(// start_
 			       // simple_expression_
 			       // list_rvalue_
-			       produit_
+			       somme_
 			       , "start")
   {
     using namespace boost::spirit::qi;
@@ -74,11 +76,12 @@ public:
       >> -lit('\n')
       ;
 
-    // multiply_ = 
-    produit_ = simple_expression_ % // char_("*/")
-      '*'
-      ;
-    somme_ = produit_ >> *(char_("+-") >> produit_);
+    multiply_ = '*' >> produit_;
+    divide_ = '/' >> produit_;
+    produit_ = simple_expression_ >> -(multiply_ | divide_);
+    add_ = '+' >> somme_;
+    substract_ = '-' >> somme_;
+    somme_ = produit_ >> -(add_ | substract_);
     numeric_rvalue_ = somme_ >> eps;
 
     numeric_lvalue_ = 
@@ -298,11 +301,15 @@ private:
   boost::spirit::qi::rule<Iterator// , IntFunction()
 			  > int_function_;
   boost::spirit::qi::rule<Iterator> expression_;
-  boost::spirit::qi::rule<Iterator> somme_;
-  boost::spirit::qi::rule<Iterator
-			  //, Produit()
-			  , std::vector<SimpleExpression>()
-			  > produit_;
+
+  boost::spirit::qi::rule<Iterator, Somme()> somme_;
+  boost::spirit::qi::rule<Iterator, Add()> add_;
+  boost::spirit::qi::rule<Iterator, Substract()> substract_;
+
+  boost::spirit::qi::rule<Iterator, Produit()> produit_;
+  boost::spirit::qi::rule<Iterator, Multiply()> multiply_;
+  boost::spirit::qi::rule<Iterator, Divide()> divide_;
+
   boost::spirit::qi::rule<Iterator, int()> digit_;
   boost::spirit::qi::rule<Iterator, Variable()> variable_;
 
