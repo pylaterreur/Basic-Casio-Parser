@@ -12,9 +12,7 @@
 
 struct VoidExpression
 {
-  typedef boost::variant<// If, 
-			 While
-			 > TypeValue;
+  typedef boost::variant<If, While> TypeValue;
   TypeValue value;
 };
 
