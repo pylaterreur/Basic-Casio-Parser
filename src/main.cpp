@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
   // SimpleExpression
   // List
   // ListRvalue
+
   LOL
     program;
 
@@ -43,7 +44,8 @@ int main(int argc, char *argv[])
   auto begin = str.begin();
   auto end = str.end();
 
-  bool r = boost::spirit::qi::parse(begin, end, p, program);
+  bool r = boost::spirit::qi::parse(begin, end, p, program
+				    );
 
   if (r && begin == end)
     {

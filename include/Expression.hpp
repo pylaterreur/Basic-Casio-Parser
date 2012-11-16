@@ -5,17 +5,19 @@
 
 # include <boost/fusion/include/adapt_struct.hpp>
 # include <boost/variant.hpp>
-# include <boost/tuple/tuple.hpp>
+# include <boost/variant/recursive_wrapper.hpp>
 
 # include "Somme.hpp"
 # include "VoidExpression.hpp"
 
+struct VoidExpression;
+
 struct Expression
 {
   typedef boost::variant<// Assignment,
-			 Somme,
-			 VoidExpression
-			 > TypeValue;
+    Somme,
+    boost::recursive_wrapper<VoidExpression>
+    > TypeValue;
   TypeValue value;
 };
 

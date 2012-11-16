@@ -3,6 +3,7 @@
 
 # include <iosfwd>
 
+# include <boost/variant/recursive_wrapper.hpp>
 # include <boost/fusion/include/adapt_struct.hpp>
 # include <boost/variant.hpp>
 # include <boost/tuple/tuple.hpp>

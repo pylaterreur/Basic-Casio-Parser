@@ -6,6 +6,8 @@
 # include <boost/spirit/include/phoenix.hpp>
 # include <boost/variant.hpp>
 
+# include "Expression.hpp"
+
 # include "Comment.hpp"
 # include "Variable.hpp"
 # include "List.hpp"
@@ -13,16 +15,20 @@
 # include "Produit.hpp"
 # include "Somme.hpp"
 
-# include "Expression.hpp"
+# include "While.hpp"
+
+# include "Break.hpp"
 
 typedef
 // SimpleExpression
 // List
 // ListRvalue
 // Produit
-// Somme
+// Break
 // Expression
 std::vector<Expression>
+// Somme
+// Break
 LOL;
 
 // std::ostream &operator<<(std::ostream& o, const LOL &l)
@@ -44,6 +50,7 @@ public:
   Parser() : Parser::base_type(// start_
 			       // simple_expression_
 			       // list_rvalue_
+			       // start_
 			       start_
 			       , "start")
   {
@@ -85,7 +92,6 @@ public:
     add_ = '+' >> somme_;
     substract_ = '-' >> somme_;
     somme_ = produit_ >> -(add_ | substract_);
-    numeric_rvalue_ = somme_ >> eps;
 
     numeric_lvalue_ = 
       (list_rvalue_ >> '[' >> // expression_
@@ -93,13 +99,14 @@ public:
        >> ']')
       | variable_;
 
-    assignment_ = numeric_rvalue_ >> "->" >> numeric_lvalue_;
+    assignment_ = somme_ >> "->" >> numeric_lvalue_;
 
     expression_ =
       // assignment_
       // | 
       void_expression_
-      | somme_
+      | 
+      somme_
       // | 
       ;
 
@@ -133,7 +140,9 @@ public:
     axeson_ = lit("AxesOn");
     bg_none_ = lit("BG-None");
     bg_pict_ = lit("BG-Pict ") >> int_;
-    break_ = lit("Break");
+    break_ = lit("Break") >> attr(Break())
+      // >> char_ >> eps
+      ;
     circle_ = lit("Circle ") >> simple_expression_ >> ',' >> simple_expression_ >> ',' >> simple_expression_;
     clrgraph_ = lit("ClrGraph");
     clrlist_ = lit("ClrList ") >> -(list_index_);
@@ -192,30 +201,34 @@ public:
     debug(comment_);
 
     condition_if_ = lit("If ")
-      >> numeric_rvalue_ >> new_line_
+      >> simple_expression_ >> new_line_
       >> lit("Then ")
-      >> *(!(lit("IfEnd") | lit("Else")) >> expression_ >> +new_line_)
+      >> *(!lit("IfEnd") >> !lit("Else") >> expression_ >> +new_line_)
       >> -(
-	   lit("Else ")
-	   >> *(!lit("IfEnd") >> expression_ >> +new_line_)
-	   )
-      >> lit("IfEnd");
+      	   lit("Else ")
+      	   >>
+	   +(!lit("IfEnd") >> expression_
+	     >> +new_line_)
+      	   )
+      >> lit("IfEnd")
+      ;
 
     condition_while_ = lit("While ")
-      >> numeric_rvalue_ >> new_line_
-      >> *(!(lit("WhileEnd")) >> loop_expression_ >> +new_line_)
+      >> simple_expression_ >> new_line_
+      >> *(!(lit("WhileEnd")) >> 
+    	   (break_ |
+    	    expression_)
+    	   >> +new_line_)
       >> lit("WhileEnd");
 
-    condition_do_lpwhile_ = lit("Do") >> new_line_
-		>> *(!(lit("LpWhile ")) >> loop_expression_ >> +new_line_)
-		>> lit("LpWhile ") >> numeric_rvalue_;
+    // condition_do_lpwhile_ = lit("Do") >> new_line_
+    // 		>> *(!(lit("LpWhile ")) >> loop_expression_ >> +new_line_)
+    // 		>> lit("LpWhile ") >> numeric_rvalue_;
 
-    condition_for_ = lit("For ") >> numeric_rvalue_ >> simple_arrow_ >> numeric_lvalue_ >> " To "
-				 >> numeric_rvalue_ >> " Step " >> numeric_rvalue_ >>  new_line_
-		>> *(!(lit("Next")) >> loop_expression_ >> +new_line_)
-		>> lit("Next");
-
-    loop_expression_ = break_ | expression_;
+    // condition_for_ = lit("For ") >> numeric_rvalue_ >> simple_arrow_ >> numeric_lvalue_ >> " To "
+    // 				 >> numeric_rvalue_ >> " Step " >> numeric_rvalue_ >>  new_line_
+    // 		>> *(!(lit("Next")) >> loop_expression_ >> +new_line_)
+    // 		>> lit("Next");
 
     or_ = lit(" Or ");
 
@@ -242,7 +255,6 @@ public:
       | axeson_
       | bg_none_
       | bg_pict_
-      | break_
       | circle_
       | clrgraph_
       | clrlist_
@@ -276,7 +288,6 @@ public:
       | condition_do_lpwhile_
       | condition_for_
       | assignment_
-      // | 
       ;
 
   }
@@ -287,23 +298,12 @@ private:
        // , Program()
        // , boost::variant<int, std::string>()
 
-			  , LOL()
+			  , std::vector<Expression>()
 			  //boost::variant<int, Variable>()
        > start_;
 
-  /*
-    simple_expression_ = int_function_
-      | number_
-
-      | (list_rvalue_ >> '[' >> simple_expression_ >> ']')
-      | variable_
-  */
-
   // SimpleExpression
-  boost::spirit::qi::rule<Iterator
-			  // , boost::variant<int, Variable>()
-			  , SimpleExpression() 
-			  > simple_expression_;
+  boost::spirit::qi::rule<Iterator, SimpleExpression()> simple_expression_;
 
   boost::spirit::qi::rule<Iterator// , IntFunction()
 			  > numeric_function_;
@@ -312,7 +312,8 @@ private:
 			  > int_function_;
   boost::spirit::qi::rule<Iterator// , Abs()
 			  > abs_;
-  boost::spirit::qi::rule<Iterator, Expression()> expression_;
+  boost::spirit::qi::rule<Iterator, Expression()
+			  > expression_;
 
   boost::spirit::qi::rule<Iterator, Somme()> somme_;
   boost::spirit::qi::rule<Iterator, Add()> add_;
@@ -337,12 +338,12 @@ private:
   boost::spirit::qi::rule<Iterator> double_arrow_;
   boost::spirit::qi::rule<Iterator> simple_arrow_;
 
-  boost::spirit::qi::rule<Iterator, Comment()
-			  > comment_;
+  boost::spirit::qi::rule<Iterator, Comment()> comment_;
 
   boost::spirit::qi::rule<Iterator> locate_;
-  boost::spirit::qi::rule<Iterator> condition_if_;
-  boost::spirit::qi::rule<Iterator> condition_while_;
+  boost::spirit::qi::rule<Iterator, If()> condition_if_;
+  boost::spirit::qi::rule<Iterator, While()
+  			  > condition_while_;
   boost::spirit::qi::rule<Iterator> condition_do_lpwhile_;
   boost::spirit::qi::rule<Iterator> condition_for_;
 
@@ -355,7 +356,9 @@ private:
   boost::spirit::qi::rule<Iterator> axeson_;
   boost::spirit::qi::rule<Iterator> bg_none_;
   boost::spirit::qi::rule<Iterator> bg_pict_;
-  boost::spirit::qi::rule<Iterator> break_;
+  boost::spirit::qi::rule<Iterator
+			  , Break()
+			  > break_;
   boost::spirit::qi::rule<Iterator> circle_;
   boost::spirit::qi::rule<Iterator> clrgraph_;
   boost::spirit::qi::rule<Iterator> clrlist_;
@@ -407,7 +410,8 @@ private:
 
   boost::spirit::qi::rule<Iterator> file_index_;
 
-  boost::spirit::qi::rule<Iterator> void_expression_;
+  boost::spirit::qi::rule<Iterator// , VoidExpression()
+			  > void_expression_;
   boost::spirit::qi::rule<Iterator> numeric_lvalue_;
   boost::spirit::qi::rule<Iterator> numeric_rvalue_;
   boost::spirit::qi::rule<Iterator> list_lvalue_;
@@ -420,14 +424,13 @@ private:
 			  > list_rvalue_;
   boost::spirit::qi::rule<Iterator> matrix_lvalue_;
   boost::spirit::qi::rule<Iterator> matrix_rvalue_;
-  //  boost::spirit::qi::rule<Iterator, Expression()> expression_;
   boost::spirit::qi::rule<Iterator> expression_no_comment_;
-  boost::spirit::qi::rule<Iterator> loop_expression_;
 
   boost::spirit::qi::rule<Iterator, unsigned int()> list_index_;
   boost::spirit::qi::rule<Iterator> mat_index_;
 
-  boost::spirit::qi::rule<Iterator, List()> list_;
+  boost::spirit::qi::rule<Iterator, List()
+			  > list_;
   boost::spirit::qi::rule<Iterator> matrix_;
 };
 
