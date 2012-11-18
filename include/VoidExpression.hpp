@@ -32,6 +32,8 @@
 # include "functions/DrawGraph.hpp"
 # include "functions/DrawOn.hpp"
 # include "functions/DrawOff.hpp"
+# include "functions/Locate.hpp"
+# include "functions/FLine.hpp"
 
 struct VoidExpression
 {
@@ -51,7 +53,9 @@ struct VoidExpression
 			 GridOn,
 			 LabelOff,
 			 LabelOn,
-			 Circle
+			 Circle,
+			 Locate,
+			 FLine
 			 > TypeValue;
   TypeValue value;
 };

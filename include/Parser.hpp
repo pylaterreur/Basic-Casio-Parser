@@ -193,11 +193,12 @@ public:
     labeloff_ = "LabelOff" >> attr(LabelOff());
     labelon_ = "LabelOn" >> attr(LabelOn());
 
+    string_ = '"' >> *(~char_('"')) >> '"';
 
     locate_ = lit("Locate ")
       >> simple_expression_ >> ','
-      >> simple_expression_ >> ",\""
-      >> *(~char_('"')) >> '"';
+      >> simple_expression_ >> ","
+      >> string_;
 
 
     comment_ %= '\'' >> *(char_ - new_line_);
@@ -339,6 +340,11 @@ private:
   boost::spirit::qi::rule<Iterator, DrawGraph()> drawgraph_;
   boost::spirit::qi::rule<Iterator, DrawOff()> drawoff_;
   boost::spirit::qi::rule<Iterator, DrawOn()> drawon_;
+  boost::spirit::qi::rule<Iterator, std::string()> string_;
+  boost::spirit::qi::rule<Iterator, Locate()> locate_;
+  boost::spirit::qi::rule<Iterator, GridOff()> gridoff_;
+  boost::spirit::qi::rule<Iterator, GridOn()> gridon_;
+  boost::spirit::qi::rule<Iterator, FLine()> fline_;
 
   boost::spirit::qi::rule<Iterator> assignment_;
 
@@ -346,7 +352,6 @@ private:
   boost::spirit::qi::rule<Iterator> simple_arrow_;
 
 
-  boost::spirit::qi::rule<Iterator> locate_;
   boost::spirit::qi::rule<Iterator> condition_do_lpwhile_;
   boost::spirit::qi::rule<Iterator> condition_for_;
 
@@ -362,7 +367,6 @@ private:
   boost::spirit::qi::rule<Iterator> dim_list_;
   boost::spirit::qi::rule<Iterator> dot_;
   boost::spirit::qi::rule<Iterator> dsz_;
-  boost::spirit::qi::rule<Iterator> fline_;
   boost::spirit::qi::rule<Iterator> file_;
   boost::spirit::qi::rule<Iterator> fix_;
   boost::spirit::qi::rule<Iterator> frac_;
@@ -371,8 +375,6 @@ private:
   boost::spirit::qi::rule<Iterator> gcd_;
   boost::spirit::qi::rule<Iterator> goto_;
   boost::spirit::qi::rule<Iterator> gra_;
-  boost::spirit::qi::rule<Iterator> gridoff_;
-  boost::spirit::qi::rule<Iterator> gridon_;
   boost::spirit::qi::rule<Iterator> horizontal_;
   boost::spirit::qi::rule<Iterator> isz_;
 
