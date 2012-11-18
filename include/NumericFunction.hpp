@@ -6,10 +6,11 @@
 
 # include "functions/Abs.hpp"
 # include "functions/Int.hpp"
+# include "functions/GetKey.hpp"
 
 struct NumericFunction
 {
-  typedef boost::variant<Abs, Int> Type;
+  typedef boost::variant<Abs, Int, GetKey> Type;
   Type value;
 };
 

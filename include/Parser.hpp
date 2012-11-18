@@ -19,6 +19,12 @@
 
 # include "Break.hpp"
 
+# include "functions/AxesOn.hpp"
+# include "functions/AxesOff.hpp"
+# include "functions/LabelOn.hpp"
+# include "functions/LabelOff.hpp"
+# include "functions/BgNone.hpp"
+
 typedef
 // SimpleExpression
 // List
@@ -26,7 +32,7 @@ typedef
 // Produit
 // Break
 // Expression
-std::vector<Expression>
+std::vector<boost::variant<Expression, Comment> >
 // Somme
 // Break
 LOL;
@@ -113,7 +119,7 @@ public:
     // start_ %= simple_expression_ >> -lit('\n');
 
     // uncomment!!!!!! PYRO UNCOMMENT!
-    start_ = expression_ % +new_line_;
+    start_ = (expression_ | comment_) % +new_line_;
 
     // !works
 
@@ -130,39 +136,37 @@ public:
 
     // !should work
 
-    numeric_function_ = int_function_ | abs_;
+    numeric_function_ = int_function_ | abs_ | getkey_;
     int_function_ = "Int " >> simple_expression_;
     abs_ = "Abs " >> simple_expression_;
 
     augment_ = "Augment(" >> matrix_rvalue_ >> ',' >> matrix_rvalue_ >> ')';
 
-    axesoff_ = lit("AxesOff");
-    axeson_ = lit("AxesOn");
-    bg_none_ = lit("BG-None");
+    axeson_ = lit("AxesOn") >> attr(AxesOn());
+    axesoff_ = lit("AxesOff") >> attr(AxesOff());
+    bg_none_ = lit("BG-None") >> attr(BgNone());
     bg_pict_ = lit("BG-Pict ") >> int_;
-    break_ = lit("Break") >> attr(Break())
-      // >> char_ >> eps
-      ;
+    break_ = lit("Break") >> attr(Break());
     circle_ = lit("Circle ") >> simple_expression_ >> ',' >> simple_expression_ >> ',' >> simple_expression_;
-    clrgraph_ = lit("ClrGraph");
+    clrgraph_ = lit("ClrGraph") >> attr(ClrGraph());
     clrlist_ = lit("ClrList ") >> -(list_index_);
     clrmat_ = lit("ClrMat") >> -(mat_index_);
-    clrtext_ = lit("ClrText");
-    cls_ = lit("Cls");
-    coordoff_ = lit("CoordOff");
-    coordon_ = lit("CoordOn");
-    cross_ = lit("Cross");
-    deg_ = "Deg";
-    derivoff_ = "DerivOff";
-    derivon_ = "DerivOn";
+    clrtext_ = lit("ClrText") >> attr(ClrText());
+    cls_ = lit("Cls") >> attr(Cls());
+    coordoff_ = lit("CoordOff") >> attr(CoordOff());
+    coordon_ = lit("CoordOn") >> attr(CoordOn());
+    cross_ = lit("Cross") >> attr(Cross());
+    deg_ = "Deg" >> attr(Deg());
+    derivoff_ = "DerivOff" >> attr(DerivOff());
+    derivon_ = "DerivOn" >> attr(DerivOn());
     dim_matrix_ = "Dim " >> matrix_lvalue_;
     dim_list_ = "Dim " >> list_lvalue_;
     dot_ = "Dot";
-    drawdyna_ = "DrawDyna";
-    drawgraph_ = "DrawGraph";
-    drawoff_ = "DrawOff";
-    drawon_ = "DrawOn";
-    drawstat_ = "DrawStat";
+    drawdyna_ = "DrawDyna" >> attr(DrawDyna());
+    drawgraph_ = "DrawGraph" >> attr(DrawGraph());
+    drawoff_ = "DrawOff" >> attr(DrawOff());
+    drawon_ = "DrawOn" >> attr(DrawOn());
+    drawstat_ = "DrawStat" >> attr(DrawStat());
     dsz_ = "Dsz " >> numeric_lvalue_;
     fline_ = "F-Line "
       >> simple_expression_ >> ','
@@ -176,18 +180,18 @@ public:
     gconnect_ = "G-Connect";
     gplot_ = "G-Plot";
     gcd_ = "GCD(" >> simple_expression_ >> ',' >> simple_expression_ >> ')';
-    getkey_ = "Getkey";
+    getkey_ = "Getkey" >> attr(GetKey());
 
     label_index_ = char_("0-9A-Z");
     goto_ = "Goto " >> label_index_;
 
     gra_ = "Gra";
-    gridoff_ = "GridOff";
-    gridon_ = "GridOn";
+    gridoff_ = "GridOff" >> attr(GridOff());
+    gridon_ = "GridOn" >> attr(GridOn());
     horizontal_ = "Horizontal " >> simple_expression_;
     isz_ = "Isz " >> numeric_lvalue_;
-    labeloff_ = "LabelOff";
-    labelon_ = "LabelOn";
+    labeloff_ = "LabelOff" >> attr(LabelOff());
+    labelon_ = "LabelOn" >> attr(LabelOn());
 
 
     locate_ = lit("Locate ")
@@ -196,9 +200,7 @@ public:
       >> *(~char_('"')) >> '"';
 
 
-    comment_.name("comment_");
     comment_ %= '\'' >> *(char_ - new_line_);
-    debug(comment_);
 
     condition_if_ = lit("If ")
       >> simple_expression_ >> new_line_
@@ -294,55 +296,57 @@ public:
 
 private:
 
-  boost::spirit::qi::rule<Iterator
-       // , Program()
-       // , boost::variant<int, std::string>()
-
-			  , std::vector<Expression>()
-			  //boost::variant<int, Variable>()
-       > start_;
-
-  // SimpleExpression
+  boost::spirit::qi::rule<Iterator, std::vector<boost::variant<Expression, Comment> >()> start_;
+  boost::spirit::qi::rule<Iterator, Expression()> expression_;
   boost::spirit::qi::rule<Iterator, SimpleExpression()> simple_expression_;
-
-  boost::spirit::qi::rule<Iterator
-			  , NumericFunction()
-			  > numeric_function_;
-
-  boost::spirit::qi::rule<Iterator, Int()> int_function_;
-  boost::spirit::qi::rule<Iterator, Abs()> abs_;
-  boost::spirit::qi::rule<Iterator, Expression()
-			  > expression_;
-
   boost::spirit::qi::rule<Iterator, Somme()> somme_;
   boost::spirit::qi::rule<Iterator, Add()> add_;
   boost::spirit::qi::rule<Iterator, Substract()> substract_;
-
   boost::spirit::qi::rule<Iterator, Produit()> produit_;
   boost::spirit::qi::rule<Iterator, Multiply()> multiply_;
   boost::spirit::qi::rule<Iterator, Divide()> divide_;
-
+  boost::spirit::qi::rule<Iterator, int()> number_;
   boost::spirit::qi::rule<Iterator, int()> digit_;
   boost::spirit::qi::rule<Iterator, Variable()> variable_;
-
-  boost::spirit::qi::rule<Iterator> unary_;
-
+  boost::spirit::qi::rule<Iterator, NumericFunction()> numeric_function_;
+  boost::spirit::qi::rule<Iterator, Int()> int_function_;
+  boost::spirit::qi::rule<Iterator, Abs()> abs_;
   boost::spirit::qi::rule<Iterator> new_line_;
+  boost::spirit::qi::rule<Iterator, char()> label_index_;
+  boost::spirit::qi::rule<Iterator, Comment()> comment_;
+  boost::spirit::qi::rule<Iterator, If()> condition_if_;
+  boost::spirit::qi::rule<Iterator, While()> condition_while_;
+  boost::spirit::qi::rule<Iterator, Break()> break_;
+  boost::spirit::qi::rule<Iterator, AxesOff()> axesoff_;
+  boost::spirit::qi::rule<Iterator, AxesOn()> axeson_;
+  boost::spirit::qi::rule<Iterator, BgNone()> bg_none_;
+  boost::spirit::qi::rule<Iterator, LabelOn()> labelon_;
+  boost::spirit::qi::rule<Iterator, LabelOff()> labeloff_;
 
-  boost::spirit::qi::rule<Iterator> label_index_;
+  boost::spirit::qi::rule<Iterator, ClrGraph()> clrgraph_;
+  boost::spirit::qi::rule<Iterator, ClrText()> clrtext_;
+  boost::spirit::qi::rule<Iterator, Cls()> cls_;
+  boost::spirit::qi::rule<Iterator, CoordOff()> coordoff_;
+  boost::spirit::qi::rule<Iterator, CoordOn()> coordon_;
+  boost::spirit::qi::rule<Iterator, Cross()> cross_;
+  boost::spirit::qi::rule<Iterator, Deg()> deg_;
+  boost::spirit::qi::rule<Iterator, DerivOn()> derivon_;
+  boost::spirit::qi::rule<Iterator, DerivOff()> derivoff_;
+  boost::spirit::qi::rule<Iterator, GetKey()> getkey_;
+  boost::spirit::qi::rule<Iterator, Circle()> circle_;
+  boost::spirit::qi::rule<Iterator, DrawStat()> drawstat_;
+  boost::spirit::qi::rule<Iterator, DrawDyna()> drawdyna_;
+  boost::spirit::qi::rule<Iterator, DrawGraph()> drawgraph_;
+  boost::spirit::qi::rule<Iterator, DrawOff()> drawoff_;
+  boost::spirit::qi::rule<Iterator, DrawOn()> drawon_;
 
   boost::spirit::qi::rule<Iterator> assignment_;
-  boost::spirit::qi::rule<Iterator, int()> number_;
 
   boost::spirit::qi::rule<Iterator> double_arrow_;
   boost::spirit::qi::rule<Iterator> simple_arrow_;
 
-  boost::spirit::qi::rule<Iterator, Comment()> comment_;
 
   boost::spirit::qi::rule<Iterator> locate_;
-  boost::spirit::qi::rule<Iterator, If()> condition_if_;
-  boost::spirit::qi::rule<Iterator, While()
-  			  > condition_while_;
   boost::spirit::qi::rule<Iterator> condition_do_lpwhile_;
   boost::spirit::qi::rule<Iterator> condition_for_;
 
@@ -351,33 +355,12 @@ private:
   boost::spirit::qi::rule<Iterator> ans_;
   boost::spirit::qi::rule<Iterator> augment_;
 
-  boost::spirit::qi::rule<Iterator> axesoff_;
-  boost::spirit::qi::rule<Iterator> axeson_;
-  boost::spirit::qi::rule<Iterator> bg_none_;
   boost::spirit::qi::rule<Iterator> bg_pict_;
-  boost::spirit::qi::rule<Iterator
-			  , Break()
-			  > break_;
-  boost::spirit::qi::rule<Iterator> circle_;
-  boost::spirit::qi::rule<Iterator> clrgraph_;
   boost::spirit::qi::rule<Iterator> clrlist_;
   boost::spirit::qi::rule<Iterator> clrmat_;
-  boost::spirit::qi::rule<Iterator> clrtext_;
-  boost::spirit::qi::rule<Iterator> cls_;
-  boost::spirit::qi::rule<Iterator> coordoff_;
-  boost::spirit::qi::rule<Iterator> coordon_;
-  boost::spirit::qi::rule<Iterator> cross_;
-  boost::spirit::qi::rule<Iterator> deg_;
-  boost::spirit::qi::rule<Iterator> derivon_;
-  boost::spirit::qi::rule<Iterator> derivoff_;
   boost::spirit::qi::rule<Iterator> dim_matrix_;
   boost::spirit::qi::rule<Iterator> dim_list_;
   boost::spirit::qi::rule<Iterator> dot_;
-  boost::spirit::qi::rule<Iterator> drawdyna_;
-  boost::spirit::qi::rule<Iterator> drawgraph_;
-  boost::spirit::qi::rule<Iterator> drawoff_;
-  boost::spirit::qi::rule<Iterator> drawon_;
-  boost::spirit::qi::rule<Iterator> drawstat_;
   boost::spirit::qi::rule<Iterator> dsz_;
   boost::spirit::qi::rule<Iterator> fline_;
   boost::spirit::qi::rule<Iterator> file_;
@@ -386,15 +369,12 @@ private:
   boost::spirit::qi::rule<Iterator> gconnect_;
   boost::spirit::qi::rule<Iterator> gplot_;
   boost::spirit::qi::rule<Iterator> gcd_;
-  boost::spirit::qi::rule<Iterator> getkey_;
   boost::spirit::qi::rule<Iterator> goto_;
   boost::spirit::qi::rule<Iterator> gra_;
   boost::spirit::qi::rule<Iterator> gridoff_;
   boost::spirit::qi::rule<Iterator> gridon_;
   boost::spirit::qi::rule<Iterator> horizontal_;
   boost::spirit::qi::rule<Iterator> isz_;
-  boost::spirit::qi::rule<Iterator> labeloff_;
-  boost::spirit::qi::rule<Iterator> labelon_;
 
   // not done yet
   boost::spirit::qi::rule<Iterator> lbl_;

@@ -10,9 +10,49 @@
 # include "If.hpp"
 # include "While.hpp"
 
+# include "functions/AxesOff.hpp"
+# include "functions/AxesOn.hpp"
+# include "functions/BgNone.hpp"
+# include "functions/ClrGraph.hpp"
+# include "functions/ClrText.hpp"
+# include "functions/Cls.hpp"
+# include "functions/CoordOff.hpp"
+# include "functions/CoordOn.hpp"
+# include "functions/Cross.hpp"
+# include "functions/Deg.hpp"
+# include "functions/DerivOff.hpp"
+# include "functions/DerivOn.hpp"
+# include "functions/GridOff.hpp"
+# include "functions/GridOn.hpp"
+# include "functions/LabelOff.hpp"
+# include "functions/LabelOn.hpp"
+# include "functions/Circle.hpp"
+# include "functions/DrawStat.hpp"
+# include "functions/DrawDyna.hpp"
+# include "functions/DrawGraph.hpp"
+# include "functions/DrawOn.hpp"
+# include "functions/DrawOff.hpp"
+
 struct VoidExpression
 {
-  typedef boost::variant<If, While> TypeValue;
+  typedef boost::variant<If, While,
+			 AxesOff,
+			 AxesOn,
+			 BgNone,
+			 ClrGraph,
+			 ClrText,
+			 Cls,
+			 CoordOff,
+			 CoordOn,
+			 Deg,
+			 DerivOff,
+			 DerivOn,
+			 GridOff,
+			 GridOn,
+			 LabelOff,
+			 LabelOn,
+			 Circle
+			 > TypeValue;
   TypeValue value;
 };
 
