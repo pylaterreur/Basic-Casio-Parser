@@ -305,13 +305,12 @@ private:
   // SimpleExpression
   boost::spirit::qi::rule<Iterator, SimpleExpression()> simple_expression_;
 
-  boost::spirit::qi::rule<Iterator// , IntFunction()
+  boost::spirit::qi::rule<Iterator
+			  , NumericFunction()
 			  > numeric_function_;
 
-  boost::spirit::qi::rule<Iterator// , IntFunction()
-			  > int_function_;
-  boost::spirit::qi::rule<Iterator// , Abs()
-			  > abs_;
+  boost::spirit::qi::rule<Iterator, Int()> int_function_;
+  boost::spirit::qi::rule<Iterator, Abs()> abs_;
   boost::spirit::qi::rule<Iterator, Expression()
 			  > expression_;
 

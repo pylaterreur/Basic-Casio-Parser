@@ -8,6 +8,7 @@
 # include <boost/variant.hpp>
 # include <boost/tuple/tuple.hpp>
 
+# include "NumericFunction.hpp"
 # include "Variable.hpp"
 
 struct List;
@@ -16,9 +17,6 @@ struct Somme;
 # include "List.hpp"
 
 struct ListIndex;
-
-struct NumericFunction
-{};
 
 struct SimpleExpression
 {
