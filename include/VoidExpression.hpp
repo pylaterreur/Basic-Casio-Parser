@@ -37,6 +37,8 @@
 # include "functions/Isz.hpp"
 # include "functions/Dsz.hpp"
 
+# include "Assignment.hpp"
+
 struct VoidExpression
 {
   typedef boost::variant<If, While,
@@ -57,9 +59,10 @@ struct VoidExpression
 			 LabelOn,
 			 Circle,
 			 Locate,
-			 FLine
-			 , Isz
-			 , Dsz
+			 FLine,
+			 Isz,
+			 Dsz
+			 , Assignment
 			 > TypeValue;
   TypeValue value;
 };

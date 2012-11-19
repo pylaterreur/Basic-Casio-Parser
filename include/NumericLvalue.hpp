@@ -15,7 +15,8 @@ struct ListIndex;
 struct NumericLvalue
 {
   typedef
-  boost::variant<Variable, ListIndex>
+  boost::variant<Variable, ListIndex// , DimList
+		 >
   Type;
   Type value;
 };

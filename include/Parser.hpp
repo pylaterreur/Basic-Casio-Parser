@@ -100,9 +100,24 @@ public:
     numeric_lvalue_ = 
       list_helper_index_
       | variable_
+      // | dim_list_
       ;
 
-    assignment_ = somme_ >> "->" >> numeric_lvalue_;
+    numeric_assignment_ = simple_expression_ >> "->" >> numeric_lvalue_;
+
+    // assignment_ = (numeric_rvalue_ >> simple_arrow_ >> (numeric_lvalue_ | dim_list_))
+    //   | (list_rvalue_ >> simple_arrow_ >> (list_ | dim_matrix_))
+    //   | (matrix_rvalue_ >> simple_arrow_ >> matrix_lvalue_)
+    //   ;
+
+    list_assignment_ = list_rvalue_ >> "->" >> (list_ // | dim_matrix_
+						)
+      ;
+
+    assignment_ = numeric_assignment_
+      | list_assignment_
+      // | matrix_assignment_
+      ;
 
     expression_ =
       // assignment_
@@ -157,7 +172,7 @@ public:
     derivoff_ = "DerivOff" >> attr(DerivOff());
     derivon_ = "DerivOn" >> attr(DerivOn());
     dim_matrix_ = "Dim " >> matrix_lvalue_;
-    dim_list_ = "Dim " >> list_lvalue_;
+    dim_list_ = "Dim " >> list_;
     dot_ = "Dot";
     drawdyna_ = "DrawDyna" >> attr(DrawDyna());
     drawgraph_ = "DrawGraph" >> attr(DrawGraph());
@@ -233,8 +248,6 @@ public:
     or_ = lit(" Or ");
 
     
-    list_lvalue_ = lit("List") >> -lit(' ') >> list_index_;
-
     list_const_ = ('{' >> (// numeric_rvalue_
 			   simple_expression_
 			   % ',') >> '}');
@@ -242,11 +255,6 @@ public:
 
     simple_arrow_ = lit("->");
     double_arrow_ = lit("=>");
-
-    assignment_ = (numeric_rvalue_ >> simple_arrow_ >> (numeric_lvalue_ | dim_list_))
-      | (list_rvalue_ >> simple_arrow_ >> (list_lvalue_ | dim_matrix_))
-      | (matrix_rvalue_ >> simple_arrow_ >> matrix_lvalue_)
-      ;
 
     void_expression_ =
       locate_
@@ -353,7 +361,9 @@ private:
   boost::spirit::qi::rule<Iterator, ListIndex()> list_helper_index_;
   boost::spirit::qi::rule<Iterator, List()> list_;
 
-  boost::spirit::qi::rule<Iterator> assignment_;
+  boost::spirit::qi::rule<Iterator, Assignment()> assignment_;
+  boost::spirit::qi::rule<Iterator, NumericAssignment()> numeric_assignment_;
+  boost::spirit::qi::rule<Iterator, ListAssignment()> list_assignment_;
 
   boost::spirit::qi::rule<Iterator> double_arrow_;
   boost::spirit::qi::rule<Iterator> simple_arrow_;
@@ -371,7 +381,8 @@ private:
   boost::spirit::qi::rule<Iterator> clrlist_;
   boost::spirit::qi::rule<Iterator> clrmat_;
   boost::spirit::qi::rule<Iterator> dim_matrix_;
-  boost::spirit::qi::rule<Iterator> dim_list_;
+  boost::spirit::qi::rule<Iterator// , DimList()
+			  > dim_list_;
   boost::spirit::qi::rule<Iterator> dot_;
   boost::spirit::qi::rule<Iterator> file_;
   boost::spirit::qi::rule<Iterator> fix_;
@@ -400,8 +411,6 @@ private:
 			  > void_expression_;
 
   boost::spirit::qi::rule<Iterator> numeric_rvalue_;
-  boost::spirit::qi::rule<Iterator> list_lvalue_;
-
 
   boost::spirit::qi::rule<Iterator> matrix_lvalue_;
   boost::spirit::qi::rule<Iterator> matrix_rvalue_;
