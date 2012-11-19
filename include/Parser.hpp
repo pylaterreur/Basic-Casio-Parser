@@ -126,7 +126,7 @@ public:
     // start_ %= simple_expression_ >> -lit('\n');
 
     // uncomment!!!!!! PYRO UNCOMMENT!
-    start_ = (expression_ | comment_) % +new_line_;
+    start_ = (expression_(false) | comment_) % +new_line_;
 
     // !works
 
@@ -213,11 +213,11 @@ public:
     condition_if_ = lit("If ")
       >> simple_expression_ >> new_line_
       >> lit("Then ")
-      >> *(!lit("IfEnd") >> !lit("Else") >> expression_ >> +new_line_)
+      >> *(!lit("IfEnd") >> !lit("Else") >> expression_(false) >> +new_line_)
       >> -(
       	   lit("Else ")
       	   >>
-	   +(!lit("IfEnd") >> expression_
+	   +(!lit("IfEnd") >> expression_(false)
 	     >> +new_line_)
       	   )
       >> lit("IfEnd")
@@ -227,7 +227,7 @@ public:
       >> simple_expression_ >> new_line_
       >> *(!(lit("WhileEnd")) >> 
     	   (break_ |
-    	    expression_)
+    	    expression_(true))
     	   >> +new_line_)
       >> lit("WhileEnd");
 
@@ -238,7 +238,7 @@ public:
     condition_for_ = lit("For ")
       >> numeric_assignment_ >> " To "
       >> simple_expression_ >> " Step " >> simple_expression_ >>  new_line_
-      >> *(!(lit("Next")) >> (break_ | expression_) >> +new_line_)
+      >> *(!(lit("Next")) >> (break_ | expression_(true)) >> +new_line_)
       >> lit("Next");
 
     or_ = lit(" Or ");
@@ -298,10 +298,10 @@ public:
 private:
 
   boost::spirit::qi::rule<Iterator, std::vector<boost::variant<Expression, Comment> >()> start_;
-  boost::spirit::qi::rule<Iterator, Expression()> expression_;
+  boost::spirit::qi::rule<Iterator, Expression(bool breakable)> expression_;
   boost::spirit::qi::rule<Iterator, SimpleExpression()> simple_expression_;
   boost::spirit::qi::rule<Iterator, Somme()> somme_;
-  boost::spirit::qi::rule<Iterator, Add()> add_;
+  boost::spirit::qi::rule<Iterator, Add> add_;
   boost::spirit::qi::rule<Iterator, Substract()> substract_;
   boost::spirit::qi::rule<Iterator, Produit()> produit_;
   boost::spirit::qi::rule<Iterator, Multiply()> multiply_;
@@ -397,8 +397,7 @@ private:
 
   boost::spirit::qi::rule<Iterator> file_index_;
 
-  boost::spirit::qi::rule<Iterator// , VoidExpression()
-			  > void_expression_;
+  boost::spirit::qi::rule<Iterator, VoidExpression()> void_expression_;
 
   boost::spirit::qi::rule<Iterator> matrix_lvalue_;
   boost::spirit::qi::rule<Iterator> matrix_rvalue_;
