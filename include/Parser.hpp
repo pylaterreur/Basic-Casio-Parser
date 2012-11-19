@@ -105,11 +105,6 @@ public:
 
     numeric_assignment_ = simple_expression_ >> "->" >> numeric_lvalue_;
 
-    // assignment_ = (simple_expression_ >> simple_arrow_ >> (numeric_lvalue_ | dim_list_))
-    //   | (list_rvalue_ >> simple_arrow_ >> (list_ | dim_matrix_))
-    //   | (matrix_rvalue_ >> simple_arrow_ >> matrix_lvalue_)
-    //   ;
-
     list_assignment_ = list_rvalue_ >> "->" >> (list_ // | dim_matrix_
 						)
       ;
@@ -197,7 +192,7 @@ public:
     label_index_ = char_("0-9A-Z");
     goto_ = "Goto " >> label_index_;
 
-    gra_ = "Gra";
+    gra_ = "Gra" >> attr(Gra());
     gridoff_ = "GridOff" >> attr(GridOff());
     gridon_ = "GridOn" >> attr(GridOn());
     horizontal_ = "Horizontal " >> simple_expression_;
@@ -254,7 +249,6 @@ public:
 			   % ',') >> '}');
     list_rvalue_ = list_ | list_const_;
 
-    simple_arrow_ = lit("->");
     double_arrow_ = lit("=>");
 
     void_expression_ =
@@ -362,14 +356,12 @@ private:
   boost::spirit::qi::rule<Iterator, unsigned int()> list_index_;
   boost::spirit::qi::rule<Iterator, ListIndex()> list_helper_index_;
   boost::spirit::qi::rule<Iterator, List()> list_;
-
+  boost::spirit::qi::rule<Iterator, For()> condition_for_;
+  boost::spirit::qi::rule<Iterator, Gra()> gra_;
 
   boost::spirit::qi::rule<Iterator> double_arrow_;
-  boost::spirit::qi::rule<Iterator> simple_arrow_;
-
 
   boost::spirit::qi::rule<Iterator> condition_do_lpwhile_;
-  boost::spirit::qi::rule<Iterator, For()> condition_for_;
 
   boost::spirit::qi::rule<Iterator> interrogation_mark_;
   boost::spirit::qi::rule<Iterator> and_;
@@ -390,7 +382,6 @@ private:
   boost::spirit::qi::rule<Iterator> gplot_;
   boost::spirit::qi::rule<Iterator> gcd_;
   boost::spirit::qi::rule<Iterator> goto_;
-  boost::spirit::qi::rule<Iterator> gra_;
   boost::spirit::qi::rule<Iterator> horizontal_;
 
   // not done yet

@@ -38,6 +38,7 @@
 # include "functions/FLine.hpp"
 # include "functions/Isz.hpp"
 # include "functions/Dsz.hpp"
+# include "functions/Gra.hpp"
 
 # include "Assignment.hpp"
 
@@ -64,8 +65,9 @@ struct VoidExpression
 			 FLine,
 			 Isz,
 			 Dsz,
-			 Assignment
-			 , For
+			 Assignment,
+			 For,
+			 Gra
 			 > TypeValue;
   TypeValue value;
 };
