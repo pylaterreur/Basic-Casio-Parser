@@ -105,7 +105,7 @@ public:
 
     numeric_assignment_ = simple_expression_ >> "->" >> numeric_lvalue_;
 
-    // assignment_ = (numeric_rvalue_ >> simple_arrow_ >> (numeric_lvalue_ | dim_list_))
+    // assignment_ = (simple_expression_ >> simple_arrow_ >> (numeric_lvalue_ | dim_list_))
     //   | (list_rvalue_ >> simple_arrow_ >> (list_ | dim_matrix_))
     //   | (matrix_rvalue_ >> simple_arrow_ >> matrix_lvalue_)
     //   ;
@@ -238,12 +238,13 @@ public:
 
     // condition_do_lpwhile_ = lit("Do") >> new_line_
     // 		>> *(!(lit("LpWhile ")) >> loop_expression_ >> +new_line_)
-    // 		>> lit("LpWhile ") >> numeric_rvalue_;
+    // 		>> lit("LpWhile ") >> simple_expression_;
 
-    // condition_for_ = lit("For ") >> numeric_rvalue_ >> simple_arrow_ >> numeric_lvalue_ >> " To "
-    // 				 >> numeric_rvalue_ >> " Step " >> numeric_rvalue_ >>  new_line_
-    // 		>> *(!(lit("Next")) >> loop_expression_ >> +new_line_)
-    // 		>> lit("Next");
+    condition_for_ = lit("For ")
+      >> numeric_assignment_ >> " To "
+      >> simple_expression_ >> " Step " >> simple_expression_ >>  new_line_
+      >> *(!(lit("Next")) >> (break_ | expression_) >> +new_line_)
+      >> lit("Next");
 
     or_ = lit(" Or ");
 
@@ -352,25 +353,23 @@ private:
   boost::spirit::qi::rule<Iterator, FLine()> fline_;
   boost::spirit::qi::rule<Iterator, Dsz()> dsz_;
   boost::spirit::qi::rule<Iterator, Isz()> isz_;
-
   boost::spirit::qi::rule<Iterator, NumericLvalue()> numeric_lvalue_;
   boost::spirit::qi::rule<Iterator, ListConst()> list_const_;
   boost::spirit::qi::rule<Iterator, ListRvalue()> list_rvalue_;
-
+  boost::spirit::qi::rule<Iterator, Assignment()> assignment_;
+  boost::spirit::qi::rule<Iterator, NumericAssignment()> numeric_assignment_;
+  boost::spirit::qi::rule<Iterator, ListAssignment()> list_assignment_;
   boost::spirit::qi::rule<Iterator, unsigned int()> list_index_;
   boost::spirit::qi::rule<Iterator, ListIndex()> list_helper_index_;
   boost::spirit::qi::rule<Iterator, List()> list_;
 
-  boost::spirit::qi::rule<Iterator, Assignment()> assignment_;
-  boost::spirit::qi::rule<Iterator, NumericAssignment()> numeric_assignment_;
-  boost::spirit::qi::rule<Iterator, ListAssignment()> list_assignment_;
 
   boost::spirit::qi::rule<Iterator> double_arrow_;
   boost::spirit::qi::rule<Iterator> simple_arrow_;
 
 
   boost::spirit::qi::rule<Iterator> condition_do_lpwhile_;
-  boost::spirit::qi::rule<Iterator> condition_for_;
+  boost::spirit::qi::rule<Iterator, For()> condition_for_;
 
   boost::spirit::qi::rule<Iterator> interrogation_mark_;
   boost::spirit::qi::rule<Iterator> and_;
@@ -409,8 +408,6 @@ private:
 
   boost::spirit::qi::rule<Iterator// , VoidExpression()
 			  > void_expression_;
-
-  boost::spirit::qi::rule<Iterator> numeric_rvalue_;
 
   boost::spirit::qi::rule<Iterator> matrix_lvalue_;
   boost::spirit::qi::rule<Iterator> matrix_rvalue_;

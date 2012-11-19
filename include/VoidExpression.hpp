@@ -10,6 +10,8 @@
 # include "If.hpp"
 # include "While.hpp"
 
+# include "For.hpp"
+
 # include "functions/AxesOff.hpp"
 # include "functions/AxesOn.hpp"
 # include "functions/BgNone.hpp"
@@ -61,8 +63,9 @@ struct VoidExpression
 			 Locate,
 			 FLine,
 			 Isz,
-			 Dsz
-			 , Assignment
+			 Dsz,
+			 Assignment
+			 , For
 			 > TypeValue;
   TypeValue value;
 };
