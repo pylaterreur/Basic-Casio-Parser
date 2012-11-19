@@ -34,6 +34,8 @@
 # include "functions/DrawOff.hpp"
 # include "functions/Locate.hpp"
 # include "functions/FLine.hpp"
+# include "functions/Isz.hpp"
+# include "functions/Dsz.hpp"
 
 struct VoidExpression
 {
@@ -56,6 +58,8 @@ struct VoidExpression
 			 Circle,
 			 Locate,
 			 FLine
+			 // ,Isz
+			 // ,Dsz
 			 > TypeValue;
   TypeValue value;
 };

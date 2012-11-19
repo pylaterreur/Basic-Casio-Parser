@@ -19,11 +19,7 @@
 
 # include "Break.hpp"
 
-# include "functions/AxesOn.hpp"
-# include "functions/AxesOff.hpp"
-# include "functions/LabelOn.hpp"
-# include "functions/LabelOff.hpp"
-# include "functions/BgNone.hpp"
+# include "NumericLvalue.hpp"
 
 typedef
 // SimpleExpression
@@ -74,12 +70,14 @@ public:
     number_ = eps[_val = 0] >> 
       +digit_[_val = (_val * 10 + _1)];
 
+    list_helper_index_ = list_ >> '[' >> simple_expression_ >> ']';
+
     // should add the *unary soon!
     simple_expression_ = 
       (
        number_
        | numeric_function_
-       | (list_ >> '[' >> simple_expression_ >> ']')
+       | list_helper_index_
        // | (lit('e') >> int_ >> ',' >> char_)
        | variable_
       // | ans_
@@ -100,10 +98,9 @@ public:
     somme_ = produit_ >> -(add_ | substract_);
 
     numeric_lvalue_ = 
-      (list_rvalue_ >> '[' >> // expression_
-       simple_expression_
-       >> ']')
-      | variable_;
+      list_helper_index_
+      | variable_
+      ;
 
     assignment_ = somme_ >> "->" >> numeric_lvalue_;
 
@@ -345,6 +342,8 @@ private:
   boost::spirit::qi::rule<Iterator, GridOff()> gridoff_;
   boost::spirit::qi::rule<Iterator, GridOn()> gridon_;
   boost::spirit::qi::rule<Iterator, FLine()> fline_;
+  boost::spirit::qi::rule<Iterator, Dsz()> dsz_;
+  boost::spirit::qi::rule<Iterator, Isz()> isz_;
 
   boost::spirit::qi::rule<Iterator> assignment_;
 
@@ -366,7 +365,6 @@ private:
   boost::spirit::qi::rule<Iterator> dim_matrix_;
   boost::spirit::qi::rule<Iterator> dim_list_;
   boost::spirit::qi::rule<Iterator> dot_;
-  boost::spirit::qi::rule<Iterator> dsz_;
   boost::spirit::qi::rule<Iterator> file_;
   boost::spirit::qi::rule<Iterator> fix_;
   boost::spirit::qi::rule<Iterator> frac_;
@@ -376,7 +374,6 @@ private:
   boost::spirit::qi::rule<Iterator> goto_;
   boost::spirit::qi::rule<Iterator> gra_;
   boost::spirit::qi::rule<Iterator> horizontal_;
-  boost::spirit::qi::rule<Iterator> isz_;
 
   // not done yet
   boost::spirit::qi::rule<Iterator> lbl_;
@@ -393,7 +390,10 @@ private:
 
   boost::spirit::qi::rule<Iterator// , VoidExpression()
 			  > void_expression_;
-  boost::spirit::qi::rule<Iterator> numeric_lvalue_;
+  boost::spirit::qi::rule<Iterator, 
+			  NumericLvalue()
+			  > numeric_lvalue_;
+
   boost::spirit::qi::rule<Iterator> numeric_rvalue_;
   boost::spirit::qi::rule<Iterator> list_lvalue_;
 
@@ -408,6 +408,9 @@ private:
   boost::spirit::qi::rule<Iterator> expression_no_comment_;
 
   boost::spirit::qi::rule<Iterator, unsigned int()> list_index_;
+
+  boost::spirit::qi::rule<Iterator, ListIndex()> list_helper_index_;
+
   boost::spirit::qi::rule<Iterator> mat_index_;
 
   boost::spirit::qi::rule<Iterator, List()
