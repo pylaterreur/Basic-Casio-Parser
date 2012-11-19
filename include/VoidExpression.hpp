@@ -58,8 +58,8 @@ struct VoidExpression
 			 Circle,
 			 Locate,
 			 FLine
-			 // ,Isz
-			 // ,Dsz
+			 , Isz
+			 , Dsz
 			 > TypeValue;
   TypeValue value;
 };

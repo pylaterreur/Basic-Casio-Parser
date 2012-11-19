@@ -345,6 +345,14 @@ private:
   boost::spirit::qi::rule<Iterator, Dsz()> dsz_;
   boost::spirit::qi::rule<Iterator, Isz()> isz_;
 
+  boost::spirit::qi::rule<Iterator, NumericLvalue()> numeric_lvalue_;
+  boost::spirit::qi::rule<Iterator, ListConst()> list_const_;
+  boost::spirit::qi::rule<Iterator, ListRvalue()> list_rvalue_;
+
+  boost::spirit::qi::rule<Iterator, unsigned int()> list_index_;
+  boost::spirit::qi::rule<Iterator, ListIndex()> list_helper_index_;
+  boost::spirit::qi::rule<Iterator, List()> list_;
+
   boost::spirit::qi::rule<Iterator> assignment_;
 
   boost::spirit::qi::rule<Iterator> double_arrow_;
@@ -390,31 +398,17 @@ private:
 
   boost::spirit::qi::rule<Iterator// , VoidExpression()
 			  > void_expression_;
-  boost::spirit::qi::rule<Iterator, 
-			  NumericLvalue()
-			  > numeric_lvalue_;
 
   boost::spirit::qi::rule<Iterator> numeric_rvalue_;
   boost::spirit::qi::rule<Iterator> list_lvalue_;
 
 
-  boost::spirit::qi::rule<Iterator, ListConst()
-			  > list_const_;
-
-  boost::spirit::qi::rule<Iterator, ListRvalue()
-			  > list_rvalue_;
   boost::spirit::qi::rule<Iterator> matrix_lvalue_;
   boost::spirit::qi::rule<Iterator> matrix_rvalue_;
   boost::spirit::qi::rule<Iterator> expression_no_comment_;
 
-  boost::spirit::qi::rule<Iterator, unsigned int()> list_index_;
-
-  boost::spirit::qi::rule<Iterator, ListIndex()> list_helper_index_;
-
   boost::spirit::qi::rule<Iterator> mat_index_;
 
-  boost::spirit::qi::rule<Iterator, List()
-			  > list_;
   boost::spirit::qi::rule<Iterator> matrix_;
 };
 
