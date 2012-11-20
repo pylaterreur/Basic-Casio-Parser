@@ -46,7 +46,7 @@
 struct VoidExpression
 {
   typedef boost::variant<If, While,
-			 // DoubleArrow,
+			 DoubleArrow,
 			 AxesOff,
 			 AxesOn,
 			 BgNone,

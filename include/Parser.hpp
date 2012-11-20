@@ -367,8 +367,8 @@ private:
   boost::spirit::qi::rule<Iterator, List()> list_;
   boost::spirit::qi::rule<Iterator, For()> condition_for_;
   boost::spirit::qi::rule<Iterator, Gra()> gra_;
-
   boost::spirit::qi::rule<Iterator, DoubleArrow(bool breakable)> double_arrow_;
+  boost::spirit::qi::rule<Iterator, VoidExpression(bool breakable, bool complex)> void_expression_;
 
   boost::spirit::qi::rule<Iterator> condition_do_lpwhile_;
 
@@ -405,8 +405,6 @@ private:
   boost::spirit::qi::rule<Iterator> or_;
 
   boost::spirit::qi::rule<Iterator> file_index_;
-
-  boost::spirit::qi::rule<Iterator, VoidExpression(bool breakable, bool complex)> void_expression_;
 
   boost::spirit::qi::rule<Iterator> matrix_lvalue_;
   boost::spirit::qi::rule<Iterator> matrix_rvalue_;
