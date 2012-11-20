@@ -117,7 +117,7 @@ public:
     expression_ =
       // assignment_
       // | 
-      void_expression_
+      void_expression_(_r1)
       | 
       somme_
       // | 
@@ -213,11 +213,11 @@ public:
     condition_if_ = lit("If ")
       >> simple_expression_ >> new_line_
       >> lit("Then ")
-      >> *(!lit("IfEnd") >> !lit("Else") >> expression_(false) >> +new_line_)
+      >> *(!lit("IfEnd") >> !lit("Else") >> expression_(_r1) >> +new_line_)
       >> -(
       	   lit("Else ")
       	   >>
-	   +(!lit("IfEnd") >> expression_(false)
+	   +(!lit("IfEnd") >> expression_(_r1)
 	     >> +new_line_)
       	   )
       >> lit("IfEnd")
@@ -286,11 +286,14 @@ public:
       | isz_
       | labeloff_
       | labelon_
-      | condition_if_
+      | condition_if_(_r1)
       | condition_while_
       | condition_do_lpwhile_
       | condition_for_
       | assignment_
+      //      03:07 < VeXocide> pystache, eps[_pass = <phoenix expression using qi::_r1>] >> <some parser>
+      | (eps[_pass = (_r1 == true)] >> break_)
+      // | 
       ;
 
   }
@@ -315,7 +318,7 @@ private:
   boost::spirit::qi::rule<Iterator> new_line_;
   boost::spirit::qi::rule<Iterator, char()> label_index_;
   boost::spirit::qi::rule<Iterator, Comment()> comment_;
-  boost::spirit::qi::rule<Iterator, If()> condition_if_;
+  boost::spirit::qi::rule<Iterator, If(bool)> condition_if_;
   boost::spirit::qi::rule<Iterator, While()> condition_while_;
   boost::spirit::qi::rule<Iterator, Break()> break_;
   boost::spirit::qi::rule<Iterator, AxesOff()> axesoff_;
@@ -397,7 +400,7 @@ private:
 
   boost::spirit::qi::rule<Iterator> file_index_;
 
-  boost::spirit::qi::rule<Iterator, VoidExpression()> void_expression_;
+  boost::spirit::qi::rule<Iterator, VoidExpression(bool)> void_expression_;
 
   boost::spirit::qi::rule<Iterator> matrix_lvalue_;
   boost::spirit::qi::rule<Iterator> matrix_rvalue_;
