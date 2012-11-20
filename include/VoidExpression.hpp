@@ -41,10 +41,12 @@
 # include "functions/Gra.hpp"
 
 # include "Assignment.hpp"
+# include "DoubleArrow.hpp"
 
 struct VoidExpression
 {
   typedef boost::variant<If, While,
+			 // DoubleArrow,
 			 AxesOff,
 			 AxesOn,
 			 BgNone,

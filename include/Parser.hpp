@@ -48,6 +48,10 @@ class Parser : public boost::spirit::qi::grammar<Iterator
 						 , LOL()
 						 >
 {
+  // struct Option
+  // {};
+  // struct Breakable
+  // {};
 public:
   Parser() : Parser::base_type(// start_
 			       // simple_expression_
@@ -117,7 +121,7 @@ public:
     expression_ =
       // assignment_
       // | 
-      void_expression_(_r1)
+      void_expression_(_r1, _r2)
       | 
       somme_
       // | 
@@ -126,7 +130,7 @@ public:
     // start_ %= simple_expression_ >> -lit('\n');
 
     // uncomment!!!!!! PYRO UNCOMMENT!
-    start_ = (expression_(false) | comment_) % +new_line_;
+    start_ = (expression_(false, true) | comment_) % +new_line_;
 
     // !works
 
@@ -213,11 +217,11 @@ public:
     condition_if_ = lit("If ")
       >> simple_expression_ >> new_line_
       >> lit("Then ")
-      >> *(!lit("IfEnd") >> !lit("Else") >> expression_(_r1) >> +new_line_)
+      >> *(!lit("IfEnd") >> !lit("Else") >> expression_(_r1, true) >> +new_line_)
       >> -(
       	   lit("Else ")
       	   >>
-	   +(!lit("IfEnd") >> expression_(_r1)
+	   +(!lit("IfEnd") >> expression_(_r1, true)
 	     >> +new_line_)
       	   )
       >> lit("IfEnd")
@@ -227,7 +231,7 @@ public:
       >> simple_expression_ >> new_line_
       >> *(!(lit("WhileEnd")) >> 
     	   (break_ |
-    	    expression_(true))
+    	    expression_(true, true))
     	   >> +new_line_)
       >> lit("WhileEnd");
 
@@ -238,7 +242,7 @@ public:
     condition_for_ = lit("For ")
       >> numeric_assignment_ >> " To "
       >> simple_expression_ >> " Step " >> simple_expression_ >>  new_line_
-      >> *(!(lit("Next")) >> (break_ | expression_(true)) >> +new_line_)
+      >> *(!(lit("Next")) >> (break_ | expression_(true, true)) >> +new_line_)
       >> lit("Next");
 
     or_ = lit(" Or ");
@@ -249,7 +253,7 @@ public:
 			   % ',') >> '}');
     list_rvalue_ = list_ | list_const_;
 
-    double_arrow_ = lit("=>");
+    double_arrow_ = simple_expression_ >> lit("=>") >> expression_(_r1, false);
 
     void_expression_ =
       locate_
@@ -286,10 +290,12 @@ public:
       | isz_
       | labeloff_
       | labelon_
-      | condition_if_(_r1)
-      | condition_while_
-      | condition_do_lpwhile_
-      | condition_for_
+      | (eps[_pass = (_r2 == true)] >> (condition_if_(_r1)
+					| double_arrow_(_r1)
+					| condition_while_
+					| condition_do_lpwhile_
+					| condition_for_ )
+	 )
       | assignment_
       //      03:07 < VeXocide> pystache, eps[_pass = <phoenix expression using qi::_r1>] >> <some parser>
       | (eps[_pass = (_r1 == true)] >> break_)
@@ -301,7 +307,7 @@ public:
 private:
 
   boost::spirit::qi::rule<Iterator, std::vector<boost::variant<Expression, Comment> >()> start_;
-  boost::spirit::qi::rule<Iterator, Expression(bool breakable)> expression_;
+  boost::spirit::qi::rule<Iterator, Expression(bool breakable, bool complex)> expression_;
   boost::spirit::qi::rule<Iterator, SimpleExpression()> simple_expression_;
   boost::spirit::qi::rule<Iterator, Somme()> somme_;
   boost::spirit::qi::rule<Iterator, Add> add_;
@@ -318,7 +324,7 @@ private:
   boost::spirit::qi::rule<Iterator> new_line_;
   boost::spirit::qi::rule<Iterator, char()> label_index_;
   boost::spirit::qi::rule<Iterator, Comment()> comment_;
-  boost::spirit::qi::rule<Iterator, If(bool)> condition_if_;
+  boost::spirit::qi::rule<Iterator, If(bool breakable)> condition_if_;
   boost::spirit::qi::rule<Iterator, While()> condition_while_;
   boost::spirit::qi::rule<Iterator, Break()> break_;
   boost::spirit::qi::rule<Iterator, AxesOff()> axesoff_;
@@ -362,7 +368,7 @@ private:
   boost::spirit::qi::rule<Iterator, For()> condition_for_;
   boost::spirit::qi::rule<Iterator, Gra()> gra_;
 
-  boost::spirit::qi::rule<Iterator> double_arrow_;
+  boost::spirit::qi::rule<Iterator, DoubleArrow(bool breakable)> double_arrow_;
 
   boost::spirit::qi::rule<Iterator> condition_do_lpwhile_;
 
@@ -400,7 +406,7 @@ private:
 
   boost::spirit::qi::rule<Iterator> file_index_;
 
-  boost::spirit::qi::rule<Iterator, VoidExpression(bool)> void_expression_;
+  boost::spirit::qi::rule<Iterator, VoidExpression(bool breakable, bool complex)> void_expression_;
 
   boost::spirit::qi::rule<Iterator> matrix_lvalue_;
   boost::spirit::qi::rule<Iterator> matrix_rvalue_;
