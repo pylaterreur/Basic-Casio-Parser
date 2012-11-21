@@ -15,6 +15,9 @@
 # include "Produit.hpp"
 # include "Somme.hpp"
 
+# include "functions/Cross.hpp"
+# include "functions/Dot.hpp"
+
 # include "While.hpp"
 
 # include "Break.hpp"
@@ -184,7 +187,7 @@ public:
     derivon_ = "DerivOn" >> attr(DerivOn());
     dim_matrix_ = "Dim " >> matrix_lvalue_;
     dim_list_ = "Dim " >> list_;
-    dot_ = "Dot";
+    dot_ = "Dot" >> attr(Dot());
     drawdyna_ = "DrawDyna" >> attr(DrawDyna());
     drawgraph_ = "DrawGraph" >> attr(DrawGraph());
     drawoff_ = "DrawOff" >> attr(DrawOff());
@@ -391,6 +394,8 @@ private:
   boost::spirit::qi::rule<Iterator, Horizontal()> horizontal_;
   boost::spirit::qi::rule<Iterator, Ans()> ans_;
   boost::spirit::qi::rule<Iterator, Gcd()> gcd_;
+  boost::spirit::qi::rule<Iterator, Dot()> dot_;
+  boost::spirit::qi::rule<Iterator, Frac()> frac_;
 
   boost::spirit::qi::rule<Iterator> augment_;
 
@@ -400,10 +405,8 @@ private:
   boost::spirit::qi::rule<Iterator> dim_matrix_;
   boost::spirit::qi::rule<Iterator// , DimList()
 			  > dim_list_;
-  boost::spirit::qi::rule<Iterator> dot_;
   boost::spirit::qi::rule<Iterator> file_;
   boost::spirit::qi::rule<Iterator> fix_;
-  boost::spirit::qi::rule<Iterator> frac_;
   boost::spirit::qi::rule<Iterator> gconnect_;
   boost::spirit::qi::rule<Iterator> gplot_;
   boost::spirit::qi::rule<Iterator> goto_;

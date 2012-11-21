@@ -21,7 +21,6 @@
 # include "functions/Cls.hpp"
 # include "functions/CoordOff.hpp"
 # include "functions/CoordOn.hpp"
-# include "functions/Cross.hpp"
 # include "functions/Deg.hpp"
 # include "functions/DerivOff.hpp"
 # include "functions/DerivOn.hpp"

@@ -8,10 +8,11 @@
 # include "functions/Int.hpp"
 # include "functions/GetKey.hpp"
 # include "functions/Gcd.hpp"
+# include "functions/Frac.hpp"
 
 struct NumericFunction
 {
-  typedef boost::variant<Abs, Int, GetKey, Gcd> Type;
+  typedef boost::variant<Abs, Int, GetKey, Gcd, Frac> Type;
   Type value;
 };
 
