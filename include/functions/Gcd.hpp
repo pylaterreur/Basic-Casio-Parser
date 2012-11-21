@@ -1,27 +1,24 @@
-#ifndef FLINE_HPP_
-# define FLINE_HPP_
+#ifndef GCD_HPP_
+# define GCD_HPP_
 
 # include <boost/variant/recursive_wrapper.hpp>
 # include <boost/fusion/include/adapt_struct.hpp>
+# include <boost/variant.hpp>
 
 # include "SimpleExpression.hpp"
 
 struct SimpleExpression;
 
-struct FLine
+struct Gcd
 {
   typedef boost::recursive_wrapper<SimpleExpression> Type;
   Type parameter1;
   Type parameter2;
-  Type parameter3;
-  Type parameter4;
 };
 
-BOOST_FUSION_ADAPT_STRUCT(FLine,
-			  (FLine::Type, parameter1)
-			  (FLine::Type, parameter2)
-			  (FLine::Type, parameter3)
-			  (FLine::Type, parameter4)
+BOOST_FUSION_ADAPT_STRUCT(Gcd,
+			  (Gcd::Type, parameter1)
+			  (Gcd::Type, parameter2)
 			  )
 
-#endif	// FLINE_HPP_
+#endif	// GCD_HPP_

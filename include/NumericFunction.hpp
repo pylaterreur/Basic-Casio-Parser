@@ -7,10 +7,11 @@
 # include "functions/Abs.hpp"
 # include "functions/Int.hpp"
 # include "functions/GetKey.hpp"
+# include "functions/Gcd.hpp"
 
 struct NumericFunction
 {
-  typedef boost::variant<Abs, Int, GetKey> Type;
+  typedef boost::variant<Abs, Int, GetKey, Gcd> Type;
   Type value;
 };
 

@@ -40,6 +40,7 @@
 # include "functions/Isz.hpp"
 # include "functions/Dsz.hpp"
 # include "functions/Gra.hpp"
+# include "functions/Horizontal.hpp"
 
 # include "Assignment.hpp"
 # include "DoubleArrow.hpp"

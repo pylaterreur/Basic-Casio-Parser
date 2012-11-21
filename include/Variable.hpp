@@ -14,6 +14,9 @@ BOOST_FUSION_ADAPT_STRUCT(Variable,
 			  (Variable::TypeName, name)
 			  )
 
+struct Ans
+{};
+
 std::ostream &operator<<(std::ostream &o, const Variable &v);
 
 #endif	// !VARIABLE_HPP_

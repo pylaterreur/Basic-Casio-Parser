@@ -152,7 +152,7 @@ public:
 
     mat_index_ = char_("A-Z") | ans_;
 
-    ans_ = lit("Ans");
+    ans_ = lit("Ans") >> attr(Ans());
 
     interrogation_mark_ = "?->" >> numeric_lvalue_;
 
@@ -378,7 +378,6 @@ private:
   boost::spirit::qi::rule<Iterator, VoidExpression(bool breakable, bool complex)> void_expression_;
   boost::spirit::qi::rule<Iterator, InterrogationMark()> interrogation_mark_;
   boost::spirit::qi::rule<Iterator, LpWhile()> condition_do_lpwhile_;
-
   boost::spirit::qi::rule<Iterator, Boolean()> boolean_;
   boost::spirit::qi::rule<Iterator, And()> and_;
   boost::spirit::qi::rule<Iterator, Or()> or_;
@@ -389,10 +388,10 @@ private:
   boost::spirit::qi::rule<Iterator, NotEqual()> not_equal_;
   boost::spirit::qi::rule<Iterator, GreaterEqual()> greater_equal_;
   boost::spirit::qi::rule<Iterator, SmallerEqual()> smaller_equal_;
+  boost::spirit::qi::rule<Iterator, Horizontal()> horizontal_;
+  boost::spirit::qi::rule<Iterator, Ans()> ans_;
+  boost::spirit::qi::rule<Iterator, Gcd()> gcd_;
 
-
-
-  boost::spirit::qi::rule<Iterator> ans_;
   boost::spirit::qi::rule<Iterator> augment_;
 
   boost::spirit::qi::rule<Iterator> bg_pict_;
@@ -407,9 +406,7 @@ private:
   boost::spirit::qi::rule<Iterator> frac_;
   boost::spirit::qi::rule<Iterator> gconnect_;
   boost::spirit::qi::rule<Iterator> gplot_;
-  boost::spirit::qi::rule<Iterator> gcd_;
   boost::spirit::qi::rule<Iterator> goto_;
-  boost::spirit::qi::rule<Iterator> horizontal_;
 
   // not done yet
   boost::spirit::qi::rule<Iterator> lbl_;
