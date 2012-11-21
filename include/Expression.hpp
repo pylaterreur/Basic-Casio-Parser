@@ -7,7 +7,7 @@
 # include <boost/variant.hpp>
 # include <boost/variant/recursive_wrapper.hpp>
 
-# include "Somme.hpp"
+# include "Boolean.hpp"
 # include "VoidExpression.hpp"
 # include "InterrogationMark.hpp"
 
@@ -16,7 +16,7 @@ struct VoidExpression;
 struct Expression
 {
   typedef boost::variant<
-    Somme,
+    Boolean,
     boost::recursive_wrapper<VoidExpression>,
     InterrogationMark
     > TypeValue;

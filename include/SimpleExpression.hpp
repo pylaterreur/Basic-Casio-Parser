@@ -12,7 +12,7 @@
 # include "Variable.hpp"
 
 struct List;
-struct Somme;
+struct Boolean;
 
 # include "List.hpp"
 
@@ -25,7 +25,7 @@ struct SimpleExpression
 			 // , boost::tuple<List, SimpleExpression>
 			 , boost::recursive_wrapper<ListIndex>
 			 , Variable
-			 , boost::recursive_wrapper<Somme>
+			 , boost::recursive_wrapper<Boolean>
 			 > TypeValue;
   TypeValue value;
 };
