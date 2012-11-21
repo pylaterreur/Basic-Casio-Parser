@@ -11,6 +11,7 @@
 # include "Comment.hpp"
 # include "Variable.hpp"
 # include "List.hpp"
+# include "Matrix.hpp"
 # include "SimpleExpression.hpp"
 # include "Produit.hpp"
 # include "Somme.hpp"
@@ -68,6 +69,11 @@ public:
     list_index_ = uint_;
     list_ = lit("List ") >> list_index_;
 
+    matrix_index_ = char_("A-Z") // | ans_
+      ;
+    matrix_ = lit("Mat ") >> matrix_index_;
+    matrix_helper_index_ = matrix_ >> '[' >> simple_expression_ >> "][" >> simple_expression_  >> ']';
+
     // works
     new_line_ = lit('\n') | ':';
 
@@ -85,6 +91,8 @@ public:
        number_
        | numeric_function_
        | list_helper_index_
+       | matrix_helper_index_
+
        // | (lit('e') >> int_ >> ',' >> char_)
        | variable_
       // | ans_
@@ -119,6 +127,7 @@ public:
 
     numeric_lvalue_ = 
       list_helper_index_
+      | matrix_helper_index_
       | variable_
       // | dim_list_
       ;
@@ -153,8 +162,6 @@ public:
 
     // should work
 
-    mat_index_ = char_("A-Z") | ans_;
-
     ans_ = lit("Ans") >> attr(Ans());
 
     interrogation_mark_ = "?->" >> numeric_lvalue_;
@@ -176,7 +183,7 @@ public:
     circle_ = lit("Circle ") >> simple_expression_ >> ',' >> simple_expression_ >> ',' >> simple_expression_;
     clrgraph_ = lit("ClrGraph") >> attr(ClrGraph());
     clrlist_ = lit("ClrList ") >> -(list_index_);
-    clrmat_ = lit("ClrMat") >> -(mat_index_);
+    clrmat_ = lit("ClrMat") >> -(matrix_index_);
     clrtext_ = lit("ClrText") >> attr(ClrText());
     cls_ = lit("Cls") >> attr(Cls());
     coordoff_ = lit("CoordOff") >> attr(CoordOff());
@@ -262,6 +269,11 @@ public:
     list_const_ = ('{' >> (// numeric_rvalue_
 			   simple_expression_
 			   % ',') >> '}');
+
+    matrix_const_ = '[' >> +('[' >> (// numeric_rvalue_
+				     simple_expression_
+				     % ',') >> ']') >> ']';
+
     list_rvalue_ = list_ | list_const_;
 
     double_arrow_ = simple_expression_ >> lit("=>") >> expression_(_r1, false);
@@ -367,14 +379,23 @@ private:
   boost::spirit::qi::rule<Iterator, Dsz()> dsz_;
   boost::spirit::qi::rule<Iterator, Isz()> isz_;
   boost::spirit::qi::rule<Iterator, NumericLvalue()> numeric_lvalue_;
-  boost::spirit::qi::rule<Iterator, ListConst()> list_const_;
-  boost::spirit::qi::rule<Iterator, ListRvalue()> list_rvalue_;
   boost::spirit::qi::rule<Iterator, Assignment()> assignment_;
   boost::spirit::qi::rule<Iterator, NumericAssignment()> numeric_assignment_;
+
+  boost::spirit::qi::rule<Iterator, ListConst()> list_const_;
+  boost::spirit::qi::rule<Iterator, ListRvalue()> list_rvalue_;
   boost::spirit::qi::rule<Iterator, ListAssignment()> list_assignment_;
   boost::spirit::qi::rule<Iterator, unsigned int()> list_index_;
   boost::spirit::qi::rule<Iterator, ListIndex()> list_helper_index_;
   boost::spirit::qi::rule<Iterator, List()> list_;
+
+  boost::spirit::qi::rule<Iterator, MatrixConst()> matrix_const_;
+  boost::spirit::qi::rule<Iterator, MatrixRvalue()> matrix_rvalue_;
+  boost::spirit::qi::rule<Iterator, MatrixAssignment()> matrix_assignment_;
+  boost::spirit::qi::rule<Iterator, char()> matrix_index_;
+  boost::spirit::qi::rule<Iterator, MatrixIndex()> matrix_helper_index_;
+  boost::spirit::qi::rule<Iterator, Matrix()> matrix_;
+
   boost::spirit::qi::rule<Iterator, For()> condition_for_;
   boost::spirit::qi::rule<Iterator, Gra()> gra_;
   boost::spirit::qi::rule<Iterator, DoubleArrow(bool breakable)> double_arrow_;
@@ -398,7 +419,6 @@ private:
   boost::spirit::qi::rule<Iterator, Frac()> frac_;
 
   boost::spirit::qi::rule<Iterator> augment_;
-
   boost::spirit::qi::rule<Iterator> bg_pict_;
   boost::spirit::qi::rule<Iterator> clrlist_;
   boost::spirit::qi::rule<Iterator> clrmat_;
@@ -423,12 +443,6 @@ private:
   boost::spirit::qi::rule<Iterator> file_index_;
 
   boost::spirit::qi::rule<Iterator> matrix_lvalue_;
-  boost::spirit::qi::rule<Iterator> matrix_rvalue_;
-  boost::spirit::qi::rule<Iterator> expression_no_comment_;
-
-  boost::spirit::qi::rule<Iterator> mat_index_;
-
-  boost::spirit::qi::rule<Iterator> matrix_;
 };
 
 #endif	// !PARSER_HPP_

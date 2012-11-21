@@ -12,7 +12,8 @@
 
 struct NumericFunction
 {
-  typedef boost::variant<Abs, Int, GetKey, Gcd, Frac> Type;
+  typedef boost::variant<Abs, Int, GetKey, Gcd, Frac// , Max
+			 > Type;
   Type value;
 };
 

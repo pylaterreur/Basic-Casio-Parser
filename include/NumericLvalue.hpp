@@ -11,11 +11,12 @@
 # include "List.hpp"
 
 struct ListIndex;
+struct MatrixIndex;
 
 struct NumericLvalue
 {
   typedef
-  boost::variant<Variable, ListIndex// , DimList
+  boost::variant<Variable, ListIndex, MatrixIndex// , DimList
 		 >
   Type;
   Type value;

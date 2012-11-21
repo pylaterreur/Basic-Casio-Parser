@@ -15,8 +15,10 @@ struct List;
 struct Boolean;
 
 # include "List.hpp"
+# include "Matrix.hpp"
 
 struct ListIndex;
+struct MatrixIndex;
 
 struct SimpleExpression
 {
@@ -24,6 +26,7 @@ struct SimpleExpression
 			 , NumericFunction
 			 // , boost::tuple<List, SimpleExpression>
 			 , boost::recursive_wrapper<ListIndex>
+			 , boost::recursive_wrapper<MatrixIndex>
 			 , Variable
 			 , boost::recursive_wrapper<Boolean>
 			 > TypeValue;
@@ -45,6 +48,18 @@ BOOST_FUSION_ADAPT_STRUCT(ListIndex,
 			  (SimpleExpression, t2)
 			  )
 
+struct MatrixIndex
+{
+  Matrix t1;
+  SimpleExpression t2;
+  SimpleExpression t3;
+};
+
+BOOST_FUSION_ADAPT_STRUCT(MatrixIndex,
+			  (Matrix, t1)
+			  (SimpleExpression, t2)
+			  (SimpleExpression, t3)
+			  )
 
 // typedef boost::variant<int, Variable> SimpleExpression;
 

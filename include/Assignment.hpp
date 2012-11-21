@@ -29,9 +29,21 @@ BOOST_FUSION_ADAPT_STRUCT(ListAssignment,
 			  (List, d)
 			  )
 
+struct MatrixAssignment
+{
+  MatrixRvalue s;
+  Matrix d;
+};
+
+BOOST_FUSION_ADAPT_STRUCT(MatrixAssignment,
+			  (MatrixRvalue, s)
+			  (Matrix, d)
+			  )
+
 struct Assignment
 {
   typedef boost::variant<NumericAssignment, ListAssignment
+			 , MatrixAssignment
 			 > Type;
   Type value;
 };
