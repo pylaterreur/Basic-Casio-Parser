@@ -120,7 +120,7 @@ public:
       // | dim_list_
       ;
 
-    numeric_assignment_ = simple_expression_ >> "->" >> numeric_lvalue_;
+    numeric_assignment_ = boolean_ >> "->" >> numeric_lvalue_;
 
     list_assignment_ = list_rvalue_ >> "->" >> (list_ // | dim_matrix_
 						)
@@ -256,9 +256,6 @@ public:
       >> *(!(lit("Next")) >> expression_(true, true) >> +new_line_)
       >> lit("Next");
 
-    or_ = lit(" Or ");
-
-    
     list_const_ = ('{' >> (// numeric_rvalue_
 			   simple_expression_
 			   % ',') >> '}');
@@ -382,16 +379,16 @@ private:
   boost::spirit::qi::rule<Iterator, InterrogationMark()> interrogation_mark_;
   boost::spirit::qi::rule<Iterator, LpWhile()> condition_do_lpwhile_;
 
-  boost::spirit::qi::rule<Iterator> boolean_;
-  boost::spirit::qi::rule<Iterator> and_;
-  boost::spirit::qi::rule<Iterator> or_;
+  boost::spirit::qi::rule<Iterator, Boolean()> boolean_;
+  boost::spirit::qi::rule<Iterator, And()> and_;
+  boost::spirit::qi::rule<Iterator, Or()> or_;
   boost::spirit::qi::rule<Iterator> not_;
-  boost::spirit::qi::rule<Iterator> greater_;
-  boost::spirit::qi::rule<Iterator> smaller_;
-  boost::spirit::qi::rule<Iterator> equal_;
-  boost::spirit::qi::rule<Iterator> not_equal_;
-  boost::spirit::qi::rule<Iterator> greater_equal_;
-  boost::spirit::qi::rule<Iterator> smaller_equal_;
+  boost::spirit::qi::rule<Iterator, Greater()> greater_;
+  boost::spirit::qi::rule<Iterator, Smaller()> smaller_;
+  boost::spirit::qi::rule<Iterator, Equal()> equal_;
+  boost::spirit::qi::rule<Iterator, NotEqual()> not_equal_;
+  boost::spirit::qi::rule<Iterator, GreaterEqual()> greater_equal_;
+  boost::spirit::qi::rule<Iterator, SmallerEqual()> smaller_equal_;
 
 
 
