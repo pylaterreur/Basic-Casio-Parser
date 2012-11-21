@@ -88,7 +88,7 @@ public:
       // can't remember matrix syntax
       // | (matrix_rvalue_ >> )
 
-      | ('(' >> somme_ >> ')')
+      | ('(' >> boolean_ >> ')')
 
       )
       >> eps
@@ -100,6 +100,19 @@ public:
     add_ = '+' >> somme_;
     substract_ = '-' >> somme_;
     somme_ = produit_ >> -(add_ | substract_);
+
+      not_equal_ = "!=" >> boolean_;
+      equal_ = "=" >> boolean_;
+      greater_ = ">" >> boolean_;
+      smaller_ = "<" >> boolean_;
+      greater_equal_ = ">=" >> boolean_;
+      smaller_equal_ = "<=" >> boolean_;
+      and_ = " And " >> boolean_;
+      or_ = " Or " >> boolean_;
+      boolean_ = somme_ >> -(not_equal_ | equal_ | greater_ | smaller_ | greater_equal_ | smaller_equal_
+			     | and_
+			     | or_
+			     );
 
     numeric_lvalue_ = 
       list_helper_index_
@@ -123,7 +136,7 @@ public:
       // | 
       void_expression_(_r1, _r2)
       | 
-      somme_
+      boolean_
       | interrogation_mark_
       // | 
       ;
@@ -139,7 +152,6 @@ public:
 
     mat_index_ = char_("A-Z") | ans_;
 
-    and_ = lit(" And ");
     ans_ = lit("Ans");
 
     interrogation_mark_ = "?->" >> numeric_lvalue_;
@@ -331,7 +343,6 @@ private:
   boost::spirit::qi::rule<Iterator, BgNone()> bg_none_;
   boost::spirit::qi::rule<Iterator, LabelOn()> labelon_;
   boost::spirit::qi::rule<Iterator, LabelOff()> labeloff_;
-
   boost::spirit::qi::rule<Iterator, ClrGraph()> clrgraph_;
   boost::spirit::qi::rule<Iterator, ClrText()> clrtext_;
   boost::spirit::qi::rule<Iterator, Cls()> cls_;
@@ -369,10 +380,21 @@ private:
   boost::spirit::qi::rule<Iterator, DoubleArrow(bool breakable)> double_arrow_;
   boost::spirit::qi::rule<Iterator, VoidExpression(bool breakable, bool complex)> void_expression_;
   boost::spirit::qi::rule<Iterator, InterrogationMark()> interrogation_mark_;
-
   boost::spirit::qi::rule<Iterator, LpWhile()> condition_do_lpwhile_;
 
+  boost::spirit::qi::rule<Iterator> boolean_;
   boost::spirit::qi::rule<Iterator> and_;
+  boost::spirit::qi::rule<Iterator> or_;
+  boost::spirit::qi::rule<Iterator> not_;
+  boost::spirit::qi::rule<Iterator> greater_;
+  boost::spirit::qi::rule<Iterator> smaller_;
+  boost::spirit::qi::rule<Iterator> equal_;
+  boost::spirit::qi::rule<Iterator> not_equal_;
+  boost::spirit::qi::rule<Iterator> greater_equal_;
+  boost::spirit::qi::rule<Iterator> smaller_equal_;
+
+
+
   boost::spirit::qi::rule<Iterator> ans_;
   boost::spirit::qi::rule<Iterator> augment_;
 
@@ -400,8 +422,6 @@ private:
   boost::spirit::qi::rule<Iterator> max_;
 
   // end not done yet
-
-  boost::spirit::qi::rule<Iterator> or_;
 
   boost::spirit::qi::rule<Iterator> file_index_;
 
