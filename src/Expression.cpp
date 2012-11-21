@@ -5,6 +5,7 @@
 
 std::ostream &operator<<(std::ostream &o, const Expression &s)
 {
-  o << "Expression" << s.value;
+  o << "Expression" // << s.value
+    ;
   return (o);
 }

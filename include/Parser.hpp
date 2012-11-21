@@ -124,6 +124,7 @@ public:
       void_expression_(_r1, _r2)
       | 
       somme_
+      | interrogation_mark_
       // | 
       ;
 
@@ -141,8 +142,7 @@ public:
     and_ = lit(" And ");
     ans_ = lit("Ans");
 
-    interrogation_mark_ = '?';
-
+    interrogation_mark_ = "?->" >> numeric_lvalue_;
 
 
     // !should work
@@ -372,7 +372,7 @@ private:
 
   boost::spirit::qi::rule<Iterator> condition_do_lpwhile_;
 
-  boost::spirit::qi::rule<Iterator> interrogation_mark_;
+  boost::spirit::qi::rule<Iterator, InterrogationMark()> interrogation_mark_;
   boost::spirit::qi::rule<Iterator> and_;
   boost::spirit::qi::rule<Iterator> ans_;
   boost::spirit::qi::rule<Iterator> augment_;

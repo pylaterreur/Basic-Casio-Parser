@@ -9,14 +9,16 @@
 
 # include "Somme.hpp"
 # include "VoidExpression.hpp"
+# include "InterrogationMark.hpp"
 
 struct VoidExpression;
 
 struct Expression
 {
-  typedef boost::variant<// Assignment,
+  typedef boost::variant<
     Somme,
-    boost::recursive_wrapper<VoidExpression>
+    boost::recursive_wrapper<VoidExpression>,
+    InterrogationMark
     > TypeValue;
   TypeValue value;
 };
