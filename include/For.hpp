@@ -12,8 +12,6 @@
 # include "SimpleExpression.hpp"
 # include "Assignment.hpp"
 
-# include "Break.hpp"
-
 struct Expression;
 
 struct For
@@ -21,8 +19,8 @@ struct For
   NumericAssignment f;
   SimpleExpression t;
   SimpleExpression s;
-  typedef std::vector<boost::variant<
-    boost::recursive_wrapper<Expression>, Break>
+  typedef std::vector<
+    boost::recursive_wrapper<Expression>
     > Type;
   Type then;
 };

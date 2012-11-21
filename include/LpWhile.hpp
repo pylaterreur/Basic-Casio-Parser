@@ -1,6 +1,6 @@
 
-#ifndef WHILE_HPP_
-# define WHILE_HPP_
+#ifndef LPWHILE_HPP_
+# define LPWHILE_HPP_
 
 # include <iosfwd>
 
@@ -13,20 +13,20 @@
 
 struct Expression;
 
-struct While
+struct LpWhile
 {
-  SimpleExpression condition;
   typedef std::vector<
     boost::recursive_wrapper<Expression>
     > Type;
   Type then;
+  SimpleExpression condition;
 };
 
-BOOST_FUSION_ADAPT_STRUCT(While,
+BOOST_FUSION_ADAPT_STRUCT(LpWhile,
+			  (LpWhile::Type, then)
 			  (SimpleExpression, condition)
-			  (While::Type, then)
 			  )
 
-//std::ostream &operator<<(std::ostream& o, const While&);
+//std::ostream &operator<<(std::ostream& o, const LpLpWhile&);
 
-#endif	// !WHILE_HPP_
+#endif	// !LPWHILE_HPP_

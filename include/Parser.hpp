@@ -230,19 +230,18 @@ public:
     condition_while_ = lit("While ")
       >> simple_expression_ >> new_line_
       >> *(!(lit("WhileEnd")) >> 
-    	   (break_ |
-    	    expression_(true, true))
+    	   (expression_(true, true))
     	   >> +new_line_)
       >> lit("WhileEnd");
 
-    // condition_do_lpwhile_ = lit("Do") >> new_line_
-    // 		>> *(!(lit("LpWhile ")) >> loop_expression_ >> +new_line_)
-    // 		>> lit("LpWhile ") >> simple_expression_;
+    condition_do_lpwhile_ = lit("Do") >> new_line_
+				      >> *(!(lit("LpWhile ")) >> expression_(true, true) >> +new_line_)
+				      >> lit("LpWhile ") >> simple_expression_;
 
     condition_for_ = lit("For ")
       >> numeric_assignment_ >> " To "
       >> simple_expression_ >> " Step " >> simple_expression_ >>  new_line_
-      >> *(!(lit("Next")) >> (break_ | expression_(true, true)) >> +new_line_)
+      >> *(!(lit("Next")) >> expression_(true, true) >> +new_line_)
       >> lit("Next");
 
     or_ = lit(" Or ");
@@ -369,10 +368,10 @@ private:
   boost::spirit::qi::rule<Iterator, Gra()> gra_;
   boost::spirit::qi::rule<Iterator, DoubleArrow(bool breakable)> double_arrow_;
   boost::spirit::qi::rule<Iterator, VoidExpression(bool breakable, bool complex)> void_expression_;
-
-  boost::spirit::qi::rule<Iterator> condition_do_lpwhile_;
-
   boost::spirit::qi::rule<Iterator, InterrogationMark()> interrogation_mark_;
+
+  boost::spirit::qi::rule<Iterator, LpWhile()> condition_do_lpwhile_;
+
   boost::spirit::qi::rule<Iterator> and_;
   boost::spirit::qi::rule<Iterator> ans_;
   boost::spirit::qi::rule<Iterator> augment_;

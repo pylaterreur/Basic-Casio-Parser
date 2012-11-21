@@ -9,6 +9,7 @@
 
 # include "If.hpp"
 # include "While.hpp"
+# include "LpWhile.hpp"
 
 # include "For.hpp"
 
@@ -43,6 +44,8 @@
 # include "Assignment.hpp"
 # include "DoubleArrow.hpp"
 
+# include "Break.hpp"
+
 struct VoidExpression
 {
   typedef boost::variant<If, While,
@@ -74,7 +77,9 @@ struct VoidExpression
 			 Dsz,
 			 Assignment,
 			 For,
-			 Gra
+			 Gra,
+			 Break,
+			 LpWhile
 			 > TypeValue;
   TypeValue value;
 };
