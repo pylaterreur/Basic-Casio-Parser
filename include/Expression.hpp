@@ -11,6 +11,8 @@
 # include "VoidExpression.hpp"
 # include "InterrogationMark.hpp"
 
+# include "Matrix.hpp"
+
 struct VoidExpression;
 
 struct Expression
@@ -19,6 +21,7 @@ struct Expression
     Boolean,
     boost::recursive_wrapper<VoidExpression>,
     InterrogationMark
+    , MatrixRvalue
     > TypeValue;
   TypeValue value;
 };

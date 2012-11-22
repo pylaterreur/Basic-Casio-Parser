@@ -138,18 +138,29 @@ public:
 						)
       ;
 
+    matrix_assignment_ = matrix_rvalue_ >> "->" >> matrix_;
+
+    matrix_function_ = augment_ >> eps;
+
+    matrix_rvalue_ =
+      matrix_function_
+      | matrix_
+      | matrix_const_;
+
     assignment_ = numeric_assignment_
       | list_assignment_
-      // | matrix_assignment_
+      | matrix_assignment_
       ;
 
     expression_ =
       // assignment_
       // | 
       void_expression_(_r1, _r2)
+      | matrix_rvalue_
       | 
       boolean_
       | interrogation_mark_
+      // | list_rvalue_
       // | 
       ;
 
@@ -280,7 +291,6 @@ public:
 
     void_expression_ =
       locate_
-      | augment_
       | axesoff_
       | axeson_
       | bg_none_
@@ -395,6 +405,7 @@ private:
   boost::spirit::qi::rule<Iterator, char()> matrix_index_;
   boost::spirit::qi::rule<Iterator, MatrixIndex()> matrix_helper_index_;
   boost::spirit::qi::rule<Iterator, Matrix()> matrix_;
+  boost::spirit::qi::rule<Iterator, MatrixFunction()> matrix_function_;
 
   boost::spirit::qi::rule<Iterator, For()> condition_for_;
   boost::spirit::qi::rule<Iterator, Gra()> gra_;
@@ -418,7 +429,7 @@ private:
   boost::spirit::qi::rule<Iterator, Dot()> dot_;
   boost::spirit::qi::rule<Iterator, Frac()> frac_;
 
-  boost::spirit::qi::rule<Iterator> augment_;
+  boost::spirit::qi::rule<Iterator, Augment()> augment_;
   boost::spirit::qi::rule<Iterator> bg_pict_;
   boost::spirit::qi::rule<Iterator> clrlist_;
   boost::spirit::qi::rule<Iterator> clrmat_;

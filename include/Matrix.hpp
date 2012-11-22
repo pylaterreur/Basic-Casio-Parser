@@ -6,6 +6,7 @@
 # include <boost/fusion/include/adapt_struct.hpp>
 
 # include "SimpleExpression.hpp"
+# include "MatrixFunction.hpp"
 
 struct SimpleExpression;
 
@@ -35,7 +36,7 @@ struct MatrixRvalue
     Matrix,
     // boost::recursive_wrapper<
     MatrixConst // >
-    // , ListFunction
+    , MatrixFunction
     > Type;
   Type value;
 };
