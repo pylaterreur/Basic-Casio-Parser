@@ -13,6 +13,8 @@
 
 # include "For.hpp"
 
+# include "Goto.hpp"
+
 # include "functions/AxesOff.hpp"
 # include "functions/AxesOn.hpp"
 # include "functions/BgNone.hpp"
@@ -40,6 +42,10 @@
 # include "functions/Dsz.hpp"
 # include "functions/Gra.hpp"
 # include "functions/Horizontal.hpp"
+
+# include "functions/ClrMat.hpp"
+# include "functions/ClrList.hpp"
+# include "functions/Fix.hpp"
 
 # include "Assignment.hpp"
 # include "DoubleArrow.hpp"
@@ -79,7 +85,11 @@ struct VoidExpression
 			 For,
 			 Gra,
 			 Break,
-			 LpWhile
+			 LpWhile,
+			 Goto,
+			 ClrList,
+			 ClrMat,
+			 Fix
 			 > TypeValue;
   TypeValue value;
 };

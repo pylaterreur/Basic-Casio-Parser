@@ -332,7 +332,7 @@ public:
       | assignment_
       //      03:07 < VeXocide> pystache, eps[_pass = <phoenix expression using qi::_r1>] >> <some parser>
       | (eps[_pass = (_r1 == true)] >> break_)
-      // | 
+      | goto_
       ;
 
   }
@@ -428,19 +428,19 @@ private:
   boost::spirit::qi::rule<Iterator, Gcd()> gcd_;
   boost::spirit::qi::rule<Iterator, Dot()> dot_;
   boost::spirit::qi::rule<Iterator, Frac()> frac_;
-
   boost::spirit::qi::rule<Iterator, Augment()> augment_;
+  boost::spirit::qi::rule<Iterator, Goto()> goto_;
+  boost::spirit::qi::rule<Iterator, ClrList()> clrlist_;
+  boost::spirit::qi::rule<Iterator, ClrMat()> clrmat_;
+  boost::spirit::qi::rule<Iterator, Fix()> fix_;
+
   boost::spirit::qi::rule<Iterator> bg_pict_;
-  boost::spirit::qi::rule<Iterator> clrlist_;
-  boost::spirit::qi::rule<Iterator> clrmat_;
   boost::spirit::qi::rule<Iterator> dim_matrix_;
   boost::spirit::qi::rule<Iterator// , DimList()
 			  > dim_list_;
   boost::spirit::qi::rule<Iterator> file_;
-  boost::spirit::qi::rule<Iterator> fix_;
   boost::spirit::qi::rule<Iterator> gconnect_;
   boost::spirit::qi::rule<Iterator> gplot_;
-  boost::spirit::qi::rule<Iterator> goto_;
 
   // not done yet
   boost::spirit::qi::rule<Iterator> lbl_;
