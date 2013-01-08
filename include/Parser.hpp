@@ -289,7 +289,7 @@ public:
 
     double_arrow_ = simple_expression_ >> lit("=>") >> expression_(_r1, false);
 
-    void_expression_ =
+    void_expression_ %=
       locate_
       | axesoff_
       | axeson_
@@ -323,14 +323,16 @@ public:
       | isz_
       | labeloff_
       | labelon_
+      // WTF WHY THIS BUILDS AN EMPTY VARIANT? ("empty", meaning a default constructed one)
       | (eps[_pass = (_r2 == true)] >> (condition_if_(_r1)
-					| double_arrow_(_r1)
-					| condition_while_
-					| condition_do_lpwhile_
-					| condition_for_ )
-	 )
+      					| double_arrow_(_r1)
+      					| condition_while_
+      					| condition_do_lpwhile_
+      					| condition_for_ 
+      					)
+      	 )
       | assignment_
-      //      03:07 < VeXocide> pystache, eps[_pass = <phoenix expression using qi::_r1>] >> <some parser>
+      // //      03:07 < VeXocide> pystache, eps[_pass = <phoenix expression using qi::_r1>] >> <some parser>
       | (eps[_pass = (_r1 == true)] >> break_)
       | goto_
       ;

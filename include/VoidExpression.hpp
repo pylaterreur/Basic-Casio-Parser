@@ -54,8 +54,7 @@
 
 struct VoidExpression
 {
-  typedef boost::variant<If, While,
-			 DoubleArrow,
+  typedef boost::variant<DoubleArrow,
 			 AxesOff,
 			 AxesOn,
 			 BgNone,
@@ -89,7 +88,9 @@ struct VoidExpression
 			 Goto,
 			 ClrList,
 			 ClrMat,
-			 Fix
+			 Fix,
+			 Horizontal,
+			 If, While
 			 > TypeValue;
   TypeValue value;
 };

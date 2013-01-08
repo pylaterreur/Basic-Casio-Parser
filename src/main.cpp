@@ -5,6 +5,7 @@
 #include <iterator>
 
 #include "Parser.hpp"
+#include "Run.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -60,4 +61,5 @@ int main(int argc, char *argv[])
 		<< std::endl;
     }
   std::cout << "Done" << std::endl;
+  run(program);
 }
